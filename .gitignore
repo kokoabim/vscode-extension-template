@@ -1,0 +1,7 @@
+**/*.vsix
+**/.DS_Store
+.vscode-test/**
+dist/**
+node_modules/**
+dist/**
+releases/**

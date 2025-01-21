@@ -1,11 +1,11 @@
 **/*.map
 **/*.ts
-**/.vscode-test.*
-**/eslint.config.mjs
-**/test/**
-**/tsconfig.json
 .gitignore
-.vscode-test/**
-.vscode/**
+.vscode-test.mjs
+.vscode-test/
+.vscode/
+dist/test/
+eslint.config.mjs
 src/**
+tsconfig.json
 vscx.sh

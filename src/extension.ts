@@ -1,14 +1,9 @@
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { ExtensionTemplateVSCodeExtension } from "./VSCodeExtension/ExtensionTemplateVSCodeExtension";
 
 export function activate(context: vscode.ExtensionContext) {
-
-    console.log('Congratulations, your extension "extension-template" is now active!');
-
-    const disposable = vscode.commands.registerCommand('extension-template.helloWorld', () => {
-        vscode.window.showInformationMessage('Hello World from Extension Template!');
-    });
-
-    context.subscriptions.push(disposable);
+    console.log('Activating Extension Template...'); // TODO: rename 'Extension Template' to reflect the name of your extension
+    ExtensionTemplateVSCodeExtension.use(context);
 }
 
 export function deactivate() { }

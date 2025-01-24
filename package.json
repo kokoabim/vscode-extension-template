@@ -30,6 +30,16 @@
     "activationEvents": [],
     "main": "./dist/extension.js",
     "contributes": {
+        "configuration": {
+            "title": "Extension Template",
+            "properties": {
+                "extension-template.yourName": {
+                    "type": "string",
+                    "default": "World",
+                    "markdownDescription": "What is _your_ name?"
+                }
+            }
+        },
         "commands": [
             {
                 "command": "extension-template.helloWorld",

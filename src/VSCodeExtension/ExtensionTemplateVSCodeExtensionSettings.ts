@@ -4,7 +4,7 @@ import { VSCodeExtensionSettings } from "./VSCodeExtensionSettings";
 export class ExtensionTemplateVSCodeExtensionSettings extends VSCodeExtensionSettings {
     yourName!: string;
 
-    protected configurationSection = "extension-template";
+    protected configurationSection = "extension-template"; // TODO: rename 'extension-template' to reflect the name of your extension
 
     private static singletonInstance: ExtensionTemplateVSCodeExtensionSettings;
 

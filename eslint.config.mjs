@@ -19,10 +19,15 @@ export default [{
             selector: "import",
             format: ["camelCase", "PascalCase"],
         }],
-
-        curly: "warn",
+        curly: [
+            "warn",
+            "multi-line"
+        ],
         eqeqeq: "warn",
         "no-throw-literal": "warn",
         semi: "warn",
+        "no-unused-vars": "warn",
+        "no-unreachable": "warn",
+        "no-unused-expressions": "warn",
     },
 }];

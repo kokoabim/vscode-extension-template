@@ -8,4 +8,4 @@ dist/test/
 eslint.config.mjs
 src/**
 tsconfig.json
-vscx.sh
+*.sh

@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { ExtensionTemplateVSCodeExtension } from "./VSCodeExtension/ExtensionTemplateVSCodeExtension";
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Activating Extension Template...'); // TODO: rename 'Extension Template' to reflect the name of your extension
+    console.log(`Activating ${context.extension.packageJSON["displayName"]} extension...`);
     ExtensionTemplateVSCodeExtension.use(context);
 }
 

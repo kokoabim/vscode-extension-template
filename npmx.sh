@@ -4,12 +4,12 @@ set -eo pipefail
 
 script_title="NPM Tasks"
 script_name="${0##*/}"
-script_switches=chy
+script_switches=chly
 
 function usage() {
     end "$script_title
 
-Use: $script_name [-c] clean|install
+Use: $script_name [-cl] clean|install
      $script_name data
      $script_name prepublish
      $script_name update
@@ -18,12 +18,13 @@ Actions:
  clean|c       Remove some build data$(text_red '†') and clean-install packages (npm-ci)
  data|d        Remove build data$(text_red '*')
  install|i     Perform data action and install packages (npm-install)
- prepublish|p  Perform install action, compile and omit dev dependencies
+ prepublish|p  Perform install action, ESLint, compile and omit dev dependencies
  update|u      Update packages except for '@types/((node)|(vscode))' and major versions (npm-update)
 
 Switches:
  -c  Compile after install (tsc)
  -h  View this help
+ -l  Run ESLint after install (eslint)
  -y  Confirm yes to run
 
 $(text_red '*')Build data:
@@ -103,6 +104,7 @@ npm_clean_install=0
 npm_install=0
 prepublish=0
 remove_data_only=0
+run_eslint=0
 update_packages=0
 yes=0
 
@@ -110,6 +112,7 @@ while getopts "${script_switches}" OPTION; do
     case "$OPTION" in
     c) compile_after_install=1 ;;
     h) usage ;;
+    l) run_eslint=1 ;;
     y) yes=1 ;;
     *) usage ;;
     esac
@@ -128,6 +131,7 @@ elif [[ "$script_action" == "data" || "$script_action" == "d" ]]; then
     script_action="Remove build data"
 elif [[ "$script_action" == "prepublish" || "$script_action" == "p" ]]; then
     npm_install=1
+    run_eslint=1
     compile_after_install=1
     prepublish=1
     script_action="Prepublish"
@@ -181,6 +185,11 @@ if [[ $npm_clean_install == 1 ]]; then
 elif [[ $npm_install == 1 ]]; then
     echo "Installing NPM packages..."
     npm install
+fi
+
+if [[ $run_eslint == 1 ]]; then
+    echo "Running ESLint..."
+    npx eslint -c eslint.config.mjs ./src || true
 fi
 
 if [[ $compile_after_install == 1 ]]; then

@@ -15,19 +15,21 @@ export default [{
     },
 
     rules: {
+        "@typescript-eslint/explicit-function-return-type": "warn",
         "@typescript-eslint/naming-convention": ["warn", {
             selector: "import",
             format: ["camelCase", "PascalCase"],
         }],
-        curly: [
+        "@typescript-eslint/no-unused-expressions": "warn",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "curly": [
             "warn",
             "multi-line"
         ],
-        eqeqeq: "warn",
+        "eqeqeq": "warn",
         "no-throw-literal": "warn",
-        semi: "warn",
-        "no-unused-vars": "warn",
         "no-unreachable": "warn",
         "no-unused-expressions": "warn",
+        "semi": "warn",
     },
 }];

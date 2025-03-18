@@ -48,21 +48,22 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm install && npm run compile && npm prune --omit=dev",
         "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile && npm run lint",
+        "install-compile": "npm install && tsc -p ./",
         "lint": "eslint src",
-        "test": "vscode-test"
+        "pretest": "npm run compile && npm run lint",
+        "test": "vscode-test",
+        "vscode:prepublish": "./npmx.sh -y prepublish",
+        "watch": "tsc -watch -p ./"
     },
     "devDependencies": {
         "@types/node": "^22.x",
         "@types/vscode": "^1.96.0",
-        "@typescript-eslint/eslint-plugin": "^8.21.0",
-        "@typescript-eslint/parser": "^8.21.0",
+        "@typescript-eslint/eslint-plugin": "^8.26.1",
+        "@typescript-eslint/parser": "^8.26.1",
         "@vscode/test-cli": "^0.0.10",
         "@vscode/test-electron": "^2.4.1",
-        "eslint": "^9.19.0",
-        "typescript": "^5.7.3"
+        "eslint": "^9.22.0",
+        "typescript": "^5.8.2"
     }
 }

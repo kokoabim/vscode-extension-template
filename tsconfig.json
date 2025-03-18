@@ -2,13 +2,16 @@
     "compilerOptions": {
         "module": "Node16",
         "target": "ES2022",
-        "outDir": "dist",
         "lib": [
             "ES2022"
         ],
-        "sourceMap": true,
         "rootDir": "src",
-        "strict": true,
+        "outDir": "dist",
+
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
+        "sourceMap": true,
+        "strict": true,
     }
 }

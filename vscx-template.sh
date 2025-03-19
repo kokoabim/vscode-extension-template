@@ -247,6 +247,7 @@ elif [[ "$script_action" == "create" ]]; then
 
     echo "Creating temporary template files..."
     sed -n '/^# Debugging/,$p' README.md >"$templates_directory/files/README.md"
+    mkdir -p "$templates_directory/files/src/VSCodeExtension"
     sed "s/extension-creator/change-me/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts >"$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"
     sed "s/extension-creator/change-me/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts >"$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts"
 

@@ -189,9 +189,9 @@ if [[ "$script_action" == "project" ]]; then
     jq ".displayName = \"$ext_display_name\" | .name = \"$ext_name\" | .publisher = \"$ext_publisher\"" package.json >package.json.tmp
     mv package.json.tmp package.json
 
-    sed -i '' "s/extension-template/$ext_id/g" package.json
-    sed -i '' "s/extension-template/$ext_id/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts
-    sed -i '' "s/extension-template/$ext_id/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts
+    sed -i '' "s/change-me/$ext_id/g" package.json
+    sed -i '' "s/change-me/$ext_id/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts
+    sed -i '' "s/change-me/$ext_id/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts
 
     popd >/dev/null
 
@@ -220,7 +220,10 @@ elif [[ "$script_action" == "create" ]]; then
         fi
     fi
 
-    [[ ! -f "$template_latest_file" ]] || rm -f "$template_latest_file"
+    if [[ -f "$template_latest_file" ]]; then
+        echo "Removing existing latest file..."
+        rm -f "$template_latest_file"
+    fi
 
     echo "Creating latest template file..."
     zip -rX "$template_latest_file" . \
@@ -238,15 +241,28 @@ elif [[ "$script_action" == "create" ]]; then
         -x "README.md" \
         -x "releases/*" \
         -x "templates/*" \
-        -x "vscx-template.sh" || end "Failed to create zip file" $?
+        -x "vscx-template.sh" \
+        -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts" \
+        -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts" || end "Failed to create zip file" $?
 
+    echo "Creating temporary template files..."
     sed -n '/^# Debugging/,$p' README.md >"$templates_directory/files/README.md"
+    sed "s/extension-creator/change-me/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts >"$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"
+    sed "s/extension-creator/change-me/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts >"$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts"
 
     pushd "${templates_directory}/files" >/dev/null
-    zip "$template_latest_file" * -x ".DS_Store" || end "Failed to add files to zip" $?
+
+    echo "Adding temporary template files to latest template file..."
+    zip -rX "$template_latest_file" * \
+        -x ".DS_Store" \
+        -x "*/.DS_Store" || end "Failed to add files to zip" $?
+
     popd >/dev/null
 
+    echo "Removing temporary template files..."
     rm -f "$templates_directory/files/README.md"
+    rm -f "$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"
+    rm -f "$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts"
 
     echo "Creating versioned template file..."
     cp "$template_latest_file" "$template_versioned_file"

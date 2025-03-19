@@ -1,10 +1,10 @@
 {
-    "name": "extension-template",
+    "name": "extension-creator",
     "publisher": "spencer.james",
     "version": "0.0.1",
-    "description": "Create your own Visual Studio Code extensions with this template",
-    "displayName": "VSCode Extension Template",
-    "shortName": "Extension Template",
+    "description": "Create your own Visual Studio Code extensions",
+    "displayName": "VSCode Extension Project Creator",
+    "shortName": "Extension Project Creator",
     "author": {
         "name": "Spencer James",
         "email": "apps@swsj.me",
@@ -31,9 +31,9 @@
     "main": "./dist/extension.js",
     "contributes": {
         "configuration": {
-            "title": "Extension Template",
+            "title": "Extension Creator",
             "properties": {
-                "extension-template.yourName": {
+                "extension-creator.yourName": {
                     "type": "string",
                     "default": "World",
                     "markdownDescription": "What is _your_ name?"
@@ -42,7 +42,11 @@
         },
         "commands": [
             {
-                "command": "extension-template.helloWorld",
+                "command": "extension-creator.create-new-extension",
+                "title": "Create VSCode New Extension..."
+            },
+            {
+                "command": "extension-creator.hello-world",
                 "title": "Hello World"
             }
         ]

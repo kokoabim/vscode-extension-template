@@ -1,33 +1,39 @@
 <h1 align="center">
     <p><img src="https://github.com/kokoabim/vscode-extension-template/blob/main/icon/extension-512.png?raw=true" alt="logo" width="240"></p>
-    <p>Visual Studio Code Extension Template</p>
+    <p>Visual Studio Code Extension Project Creator</p>
 </h1>
-<h3 align="center">Create your own Visual Studio Code extension</h3>
+<h3 align="center">Create your own Visual Studio Code extensions</h3>
 
-# Get Started
+# Getting Started
 
-There are a few ways to get started. The easiest way is to have this extension installed and use the VSCode Command Palette.
+There are a few ways to get started. The easiest way is to have this extension installed and use a VSCode command.
 
-### Use VSCode Command Palette
+### Use VSCode Command
 
-If you're in VSCode with this extension installed, use the `Create New VSCode Extension...` command to create a new extension from this extension's latest template.
+If you're in VSCode with this extension installed, use the `Create New VSCode Extension...` command to create a new extension project from this extension's latest template.
 
 ### Use Git Repository
 
-If you're not in VSCode with this extension installed, you can clone a git repository.
+If you're not in VSCode with this extension installed, you can clone this extension's git repository.
 
 1. Clone repository: `git@github.com:kokoabim/vscode-extension-template.git`
-2. Run `./vscx-template.sh project <name> <publisher> <path>` (included in this repository) to create a new extension project using the latest template.
-3. Install dependencies by running `./npmx.sh install` (included in this repository) or `npm install`.
-4. Open new directory in Visual Studio Code.
-5. Address all TODOs in the code (Find in Files for `TODO`) to match your extension.
-6. Modify the `./package.json` file to match your extension (name, publisher, author description, etc.).
+2. In its directory, run `./vscx-template.sh project <name> <publisher> <path>` (included in the repository) to create a new extension project using the latest template.
+3. Install NPM dependencies by running `./npmx.sh install` (included in this repository) or `npm install`.
+4. Open new extension directory in Visual Studio Code.
+5. Modify the `./package.json` file for your extension: name, publisher, description, author, etc.
+    - See https://code.visualstudio.com/api/references/extension-manifest for more information.
+6. Address all TODOs in the code (Find in Files for `TODO`) for your extension.
 
 ### Download Latest Template
 
-You can download the latest template but you will have to modify the `./package.json` file (name, publisher, replace `extension-template` instances, etc) and some source files (replace `extension-template` instances).
-
-Download link: https://github.com/kokoabim/vscode-extension-template/raw/refs/heads/main/templates/vscx-template-latest.zip
+1. Download the latest template: https://github.com/kokoabim/vscode-extension-template/raw/refs/heads/main/templates/vscx-template-latest.zip
+2. Unzip the file into a new extension project directory.
+3. Modify the `./package.json` file appropriate values for: name, publisher, description, author, etc.
+    - Replace `change-me` instances with your extension's name.
+    - Replace `Change Me` with appropriate values.
+4. Modify some source files to replace `change-me` instances with your extension's name.
+    - See https://code.visualstudio.com/api/references/extension-manifest for more information.
+5. Address all TODOs in the code (Find in Files for `TODO`) for your extension.
 
 # Debugging and Testing
 

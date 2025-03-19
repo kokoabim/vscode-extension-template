@@ -16,7 +16,7 @@ export class ExtensionTemplateVSCodeExtension extends VSCodeExtension {
     }
 
     private createSayHelloWorldCommand(): VSCodeCommand {
-        return new VSCodeCommand("extension-template.helloWorld", async () => {
+        return new VSCodeCommand("extension-creator.hello-world", async () => {
             const settings = ExtensionTemplateVSCodeExtensionSettings.singleton(true);
             await this.information(`Hello ${settings.yourName}!`);
         });

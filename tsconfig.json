@@ -26,8 +26,9 @@
         "src"
     ],
     "exclude": [
-        ".vscode-test",
-        "dist/**/*",
-        "node_modules",
+        "./.vscode-test",
+        "./dist",
+        "./node_modules",
+        "./templates"
     ],
 }

@@ -5,7 +5,12 @@ import tsParser from "@typescript-eslint/parser";
 export default [
     {
         files: ["**/*.ts"],
-        ignores: ["**/test/**/*"],
+        ignores: [
+            "**/dist/**/*",
+            "**/node_modules/**/*",
+            "**/templates/**/*",
+            "**/test/**/*"
+        ],
 
         plugins: {
             "@typescript-eslint": typescriptEslint,

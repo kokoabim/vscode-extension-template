@@ -1,9 +1,9 @@
 {
-    "name": "extension-template",
-    "publisher": "publisher.id",
+    "name": "change-me",
+    "publisher": "change-me",
     "version": "0.0.1",
-    "description": "",
-    "displayName": "Extension Template",
+    "description": "Change Me",
+    "displayName": "Change Me",
     "shortName": "",
     "author": {
         "name": "",
@@ -31,9 +31,9 @@
     "main": "./dist/extension.js",
     "contributes": {
         "configuration": {
-            "title": "Extension Template",
+            "title": "Change Me",
             "properties": {
-                "extension-template.yourName": {
+                "change-me.yourName": {
                     "type": "string",
                     "default": "World",
                     "markdownDescription": "What is _your_ name?"
@@ -42,7 +42,7 @@
         },
         "commands": [
             {
-                "command": "extension-template.helloWorld",
+                "command": "change-me.hello-world",
                 "title": "Hello World"
             }
         ]

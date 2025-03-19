@@ -6,6 +6,8 @@
 
 # Get Started
 
+There are a few ways to get started. The easiest way is to have this extension installed and use the VSCode Command Palette.
+
 ### Use VSCode Command Palette
 
 If you're in VSCode with this extension installed, use the `Create New VSCode Extension...` command to create a new extension from this extension's latest template.
@@ -20,6 +22,12 @@ If you're not in VSCode with this extension installed, you can clone a git repos
 4. Open new directory in Visual Studio Code.
 5. Address all TODOs in the code (Find in Files for `TODO`) to match your extension.
 6. Modify the `./package.json` file to match your extension (name, publisher, author description, etc.).
+
+### Download Latest Template
+
+You can download the latest template but you will have to modify the `./package.json` file (name, publisher, replace `extension-template` instances, etc) and some source files (replace `extension-template` instances).
+
+Download link: https://github.com/kokoabim/vscode-extension-template/raw/refs/heads/main/templates/vscx-template-latest.zip
 
 # Debugging and Testing
 

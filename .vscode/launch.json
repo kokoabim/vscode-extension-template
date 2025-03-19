@@ -2,16 +2,39 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Extension",
+            "name": "Debug Extension",
             "type": "extensionHost",
             "request": "launch",
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
+            "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
-            "preLaunchTask": "${defaultBuildTask}"
+            "preLaunchTask": "${defaultBuildTask}",
+            "skipFiles": [
+                "**/node_modules/**/*",
+                "<node_internals>/**/*"
+            ],
+        },
+        {
+            "name": "Run Tests",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
+            "preLaunchTask": "${defaultBuildTask}",
+            "skipFiles": [
+                "**/node_modules/**/*",
+                "<node_internals>/**/*"
+            ],
+            "testConfiguration": "${workspaceFolder}/.vscode-test.mjs"
         }
     ]
 }

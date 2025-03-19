@@ -45,7 +45,7 @@ This uses `vscode-test` and `test-cli`. See https://github.com/microsoft/vscode-
 
 _Brand_ your extension.
 
-1. Add an icon in `./icon/` directory and modify the `./package.json` file to match the icon's path. An icon size of 512x512 seems to render well.
+1. Modify the `./icon/extension*` files to match your extension.
 2. Modify this `./README.md` file to match your extension. This is what is displayed on the extension's marketplace page.
 3. Modify the `./CHANGELOG.md` file to match your extension. This is what is displayed on the extension's marketplace page.
 4. Install the extension locally and try to break it. See below `./vscx.sh pub-install` command for more information.

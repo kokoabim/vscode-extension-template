@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+
 import { VSCodeCommand } from "./VSCodeCommand";
 
 export abstract class VSCodeExtension {
@@ -11,7 +12,7 @@ export abstract class VSCodeExtension {
     constructor(context: vscode.ExtensionContext, createOutputChannel = false) {
         this.context = context;
         this.fullName = this.jsonValue("displayName");
-        this.shortName = this.jsonValue("shortName");
+        this.shortName = this.jsonValue("shortName") || this.fullName;
 
         if (createOutputChannel) this.outputChannel = vscode.window.createOutputChannel(this.shortName);
     }

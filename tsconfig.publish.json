@@ -3,7 +3,8 @@
         "module": "CommonJS",
         "target": "ES2022",
         "lib": [
-            "ES2022"
+            "ES2022",
+            "DOM"
         ],
         "rootDir": "src",
         "outDir": "dist",
@@ -23,11 +24,12 @@
         "removeComments": true,
     },
     "include": [
-        "src"
+        "./src"
     ],
     "exclude": [
-        ".vscode-test",
-        "dist/**/*",
-        "node_modules",
+        "./src/test",
+        "./.vscode-test",
+        "./dist",
+        "./node_modules",
     ],
 }

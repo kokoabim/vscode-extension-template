@@ -1,5 +1,6 @@
 import { defineConfig } from '@vscode/test-cli';
 
 export default defineConfig({
-	files: 'dist/test/**/*.test.js',
+    // NOTE: Glob of files to load (can be an array and include absolute paths)
+    files: './dist/test/**/*.test.js',
 });

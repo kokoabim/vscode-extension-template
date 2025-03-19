@@ -5,8 +5,8 @@
     "search.exclude": {
         "dist": true
     },
-    "typescript.tsc.autoDetect": "off",
-    "cSpell.ignoreWords": [
+    "cSpell.words": [
+        "npmx",
         "vscx"
     ]
 }

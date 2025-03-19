@@ -1,25 +1,25 @@
 {
     "name": "extension-template",
-    "publisher": "spencer.james",
+    "publisher": "publisher.id",
     "version": "0.0.1",
-    "description": "Create your own Visual Studio Code extensions with this template",
-    "displayName": "VSCode Extension Template",
-    "shortName": "Extension Template",
+    "description": "",
+    "displayName": "Extension Template",
+    "shortName": "",
     "author": {
-        "name": "Spencer James",
-        "email": "apps@swsj.me",
-        "url": "https://swsj.me/"
+        "name": "",
+        "email": "",
+        "url": ""
     },
-    "homepage": "https://github.com/kokoabim/vscode-extension-template/README.md",
+    "homepage": "",
     "bugs": {
-        "url": "https://github.com/kokoabim/vscode-extension-template/issues"
+        "url": ""
     },
     "repository": {
-        "type": "git",
-        "url": "https://github.com/kokoabim/vscode-extension-template"
+        "type": "",
+        "url": ""
     },
     "license": "LICENSE.md",
-    "icon": "icon/extension-512.png",
+    "icon": "",
     "engines": {
         "vscode": "^1.96.0"
     },

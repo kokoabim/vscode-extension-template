@@ -1,10 +1,10 @@
 import { VSCodeExtensionSettings } from "./VSCodeExtensionSettings";
 
-// TODO: rename 'ExtensionTemplateVSCodeExtensionSettings' to reflect the name of your extension
+// TODO: rename 'ExtensionTemplateVSCodeExtensionSettings' to reflect the name of your extension and this file
 export class ExtensionTemplateVSCodeExtensionSettings extends VSCodeExtensionSettings {
-    yourName!: string;
+    public yourName!: string;
 
-    protected configurationSection = "extension-template"; // TODO: rename 'extension-template' to reflect the name of your extension
+    protected configurationSection = "extension-template";
 
     private static singletonInstance: ExtensionTemplateVSCodeExtensionSettings;
 
@@ -23,7 +23,7 @@ export class ExtensionTemplateVSCodeExtensionSettings extends VSCodeExtensionSet
     private static readConfigAndAssignSettings(settings: ExtensionTemplateVSCodeExtensionSettings): void {
         if (!settings.hasConfiguration()) return;
 
-        // TODO: get settings and assign to 'settings' instance
+        // TODO: get settings and assign to 'settings' instance, example:
 
         settings.yourName = settings.get<string>("yourName") || "Somebody";
     }

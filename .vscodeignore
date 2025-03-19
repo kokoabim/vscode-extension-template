@@ -8,8 +8,11 @@
 
 eslint.config.mjs
 tsconfig.json
+tsconfig.publish.json
 
 .vscode-test/
 .vscode/
 dist/test/
+releases/
 src/
+templates/vscx-template-v*.zip

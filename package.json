@@ -1,7 +1,7 @@
 {
     "name": "extension-creator",
     "publisher": "spencerjames",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Create your own Visual Studio Code extensions",
     "displayName": "VSCode Extension Project Creator",
     "shortName": "Extension Project Creator",
@@ -24,9 +24,16 @@
         "vscode": "^1.96.0"
     },
     "categories": [
-        "Other"
+        "Snippets",
+        "Programming Languages",
+        "Education"
     ],
-    "keywords": [],
+    "keywords": [
+        "vscode",
+        "extension",
+        "template",
+        "project"
+    ],
     "activationEvents": [],
     "main": "./dist/extension.js",
     "contributes": {

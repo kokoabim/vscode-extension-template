@@ -1,8 +1,9 @@
 import * as vscode from "vscode";
 
 import { VSCodeCommand } from "./VSCodeCommand";
+import { VSCodeExtensionUI } from "./VSCodeExtensionUI";
 
-export abstract class VSCodeExtension {
+export abstract class VSCodeExtension implements VSCodeExtensionUI {
     protected context: vscode.ExtensionContext;
     protected fullName: string;
     protected outputChannel: vscode.OutputChannel | undefined;
@@ -17,20 +18,64 @@ export abstract class VSCodeExtension {
         if (createOutputChannel) this.outputChannel = vscode.window.createOutputChannel(this.shortName);
     }
 
+    public channelOutput(message: string, show = false, preserveFocus = true): void {
+        if (!this.outputChannel) return;
+
+        if (show) this.outputChannel.show(preserveFocus);
+        this.outputChannel.append(message);
+    }
+
+    public channelOutputLine(message: string, show = false, preserveFocus = true): void {
+        if (!this.outputChannel) return;
+
+        if (show) this.outputChannel.show(preserveFocus);
+        this.outputChannel.appendLine(message);
+    }
+
+    public clearChannel(show = false, preserveFocus = true): void {
+        if (!this.outputChannel) return;
+
+        this.outputChannel.clear();
+
+        if (show) this.outputChannel.show(preserveFocus);
+    }
+
+    public async error(message: string, noPrefix = false): Promise<void> {
+        await vscode.window.showErrorMessage(`${noPrefix ? "" : `${this.shortName}: `}${message}`);
+    }
+
+    public async information(message: string, noPrefix = false): Promise<void> {
+        await vscode.window.showInformationMessage(`${noPrefix ? "" : `${this.shortName}: `}${message}`);
+    }
+
+    public async modalError(title: string, detail: string, ...items: string[]): Promise<string | undefined> {
+        return await vscode.window.showErrorMessage(title, { detail: detail, modal: true }, ...items);
+    }
+
+    public async modalInformation(title: string, detail: string, ...items: string[]): Promise<string | undefined> {
+        return await vscode.window.showInformationMessage(title, { detail: detail, modal: true }, ...items);
+    }
+
+    public async modalWarning(title: string, detail: string, ...items: string[]): Promise<string | undefined> {
+        return await vscode.window.showWarningMessage(title, { detail: detail, modal: true }, ...items);
+    }
+
+    public showChannel(preserveFocus = true): void {
+        if (!this.outputChannel) return;
+
+        this.outputChannel.show(preserveFocus);
+    }
+
+    public async warning(message: string, noPrefix = false): Promise<void> {
+        await vscode.window.showWarningMessage(`${noPrefix ? "" : `${this.shortName}: `}${message}`);
+    }
+
     protected addCommands(...commands: VSCodeCommand[]): void {
         commands.forEach(c => this.context.subscriptions.push(vscode.commands.registerCommand(c.name, c.command)));
     }
 
-    protected clearOutput(): void {
-        this.outputChannel?.clear();
-    }
-
-    protected async error(message: string): Promise<void> {
-        await vscode.window.showErrorMessage(`${this.shortName}: ${message}`);
-    }
-
     protected async getTextDocument(trySelectedIfNotActive = true, showWarningMessage = true): Promise<vscode.TextDocument | undefined> {
-        let document;
+        let document: vscode.TextDocument | undefined;
         try {
             document = vscode.window.activeTextEditor?.document;
             if (document) { return document; }
@@ -52,8 +97,10 @@ export abstract class VSCodeExtension {
         return undefined;
     }
 
-    protected async information(message: string): Promise<void> {
-        await vscode.window.showInformationMessage(`${this.shortName}: ${message}`);
+    protected async getTextEditor(showWarningMessage = true): Promise<vscode.TextEditor | undefined> {
+        const textEditor = vscode.window.activeTextEditor;
+        if (!textEditor && showWarningMessage) await this.warning("No editor is open.");
+        return textEditor;
     }
 
     protected async isWorkspaceOpen(showWarningMessage = true): Promise<boolean> {
@@ -69,29 +116,5 @@ export abstract class VSCodeExtension {
 
     protected jsonValue(name: string): any {
         return this.context.extension.packageJSON[name];
-    }
-
-    protected output(message: string, show = false, preserveFocus = true): void {
-        if (!this.outputChannel) return;
-
-        if (show) this.outputChannel.show(preserveFocus);
-        this.outputChannel.append(message);
-    }
-
-    protected outputLine(message: string, show = false, preserveFocus = true): void {
-        if (!this.outputChannel) return;
-
-        if (show) this.outputChannel.show(preserveFocus);
-        this.outputChannel.appendLine(message);
-    }
-
-    protected showOutput(preserveFocus = true): void {
-        if (!this.outputChannel) return;
-
-        this.outputChannel.show(preserveFocus);
-    }
-
-    protected async warning(message: string): Promise<void> {
-        await vscode.window.showWarningMessage(`${this.shortName}: ${message}`);
     }
 }

@@ -42,8 +42,9 @@
         },
         "commands": [
             {
-                "command": "extension-creator.create-new-extension",
-                "title": "Create VSCode New Extension..."
+                "category": "Extension Creator",
+                "command": "extension-creator.create-new-extension-project",
+                "title": "Create New VSCode Extension..."
             },
             {
                 "command": "extension-creator.hello-world",
@@ -70,6 +71,7 @@
         "typescript": "^5.8.2"
     },
     "dependencies": {
-        "@types/vscode": "^1.96.0"
+        "@types/vscode": "^1.96.0",
+        "extract-zip": "^2.0.1"
     }
 }

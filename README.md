@@ -6,11 +6,19 @@
 
 # Getting Started
 
-There are a few ways to get started. The easiest way is to have this extension installed and use a VSCode command.
+There are a few ways to get started.
 
 ### Use VSCode Command
 
-If you're in VSCode with this extension installed, use the `Create New VSCode Extension...` command to create a new extension project from this extension's latest template.
+This is the preferred way as it is the easiest, most convenient and will always use the latest template.
+
+1. Install this extension: https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator
+2. Use its `Create New VSCode Extension...` command.
+3. Fill in the prompts.
+4. Open new extension directory in Visual Studio Code.
+5. Modify the `./package.json` file with appropriate values: description, author, etc.
+    - See https://code.visualstudio.com/api/references/extension-manifest for more information.
+6. Address all TODOs in source files (Find in Files: `TODO`) as appropriate.
 
 ### Use Git Repository
 
@@ -20,20 +28,21 @@ If you're not in VSCode with this extension installed, you can clone this extens
 2. In its directory, run `./vscx-template.sh project <name> <publisher> <path>` (included in the repository) to create a new extension project using the latest template.
 3. Install NPM dependencies by running `./npmx.sh install` (included in this repository) or `npm install`.
 4. Open new extension directory in Visual Studio Code.
-5. Modify the `./package.json` file for your extension: name, publisher, description, author, etc.
+5. Modify the `./package.json` file with appropriate values: name, publisher, displayName, description, author, etc.
     - See https://code.visualstudio.com/api/references/extension-manifest for more information.
-6. Address all TODOs in the code (Find in Files for `TODO`) for your extension.
+6. Address all TODOs in source files (Find in Files: `TODO`) as appropriate.
 
 ### Download Latest Template
 
 1. Download the latest template: https://github.com/kokoabim/vscode-extension-template/raw/refs/heads/main/templates/vscx-template-latest.zip
 2. Unzip the file into a new extension project directory.
-3. Modify the `./package.json` file appropriate values for: name, publisher, description, author, etc.
+3. Modify the `./package.json` file with appropriate values: name, publisher, displayName, description, author, etc.
     - Replace `change-me` instances with your extension's name.
     - Replace `Change Me` with appropriate values.
-4. Modify some source files to replace `change-me` instances with your extension's name.
     - See https://code.visualstudio.com/api/references/extension-manifest for more information.
-5. Address all TODOs in the code (Find in Files for `TODO`) for your extension.
+4. Modify source files (Find in Files: `change-me`) with your extension's name.
+    - See https://code.visualstudio.com/api/references/extension-manifest for more information.
+5. Address all TODOs in source files (Find in Files: `TODO`) as appropriate.
 
 # Debugging and Testing
 
@@ -60,8 +69,8 @@ This uses `vscode-test` and `test-cli`. See https://github.com/microsoft/vscode-
 _Brand_ your extension.
 
 1. Add an icon in `./icon/` directory and modify the `./package.json` file to match the icon's path. An icon size of 512x512 seems to render well.
-2. Modify this `./README.md` file to match your extension. This is what is displayed on the extension's marketplace page.
-3. Modify the `./CHANGELOG.md` file to match your extension. This is what is displayed on the extension's marketplace page.
+2. Modify this `./README.md` file to match your extension. This is what is displayed on the extension's Marketplace page.
+3. Modify the `./CHANGELOG.md` file to match your extension. This is what is displayed on the extension's Marketplace page.
 4. Install the extension locally and try to break it. See below `./vscx.sh pub-install` command for more information.
 
 # Publishing
@@ -89,8 +98,10 @@ A command you'll probably end up using a lot is `./vscx.sh -oxy pi` which will:
 3. Uninstalling extension (if installed).
 4. Install the extension using the new `.vsix` file.
 
+Note: If you install a `.vsix` file locally, you'll want to uninstall it after testing to later install the new version from the Visual Studio Code Extensions Side Bar once published to the Marketplace.
+
 ### Publishing to the Visual Studio Marketplace
 
-Logged in to the Visual Studio Marketplace, go to https://marketplace.visualstudio.com/manage and upload the `.vsix` file.
+Log into to the Visual Studio Marketplace and go to https://marketplace.visualstudio.com/manage to upload the `.vsix` file.
 
 See https://code.visualstudio.com/api/working-with-extensions/publishing-extension#publishing-extensions for more information.

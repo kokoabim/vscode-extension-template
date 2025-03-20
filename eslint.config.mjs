@@ -34,6 +34,7 @@ export default [
             }],
             "@typescript-eslint/no-unused-expressions": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
+            "@typescript-eslint/no-namespace": "off",
 
             "curly": [
                 "warn",

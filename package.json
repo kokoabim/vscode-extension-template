@@ -10,7 +10,7 @@
         "email": "apps@swsj.me",
         "url": "https://swsj.me/"
     },
-    "homepage": "https://github.com/kokoabim/vscode-extension-template/README.md",
+    "homepage": "https://github.com/kokoabim/vscode-extension-template",
     "bugs": {
         "url": "https://github.com/kokoabim/vscode-extension-template/issues"
     },

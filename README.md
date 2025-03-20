@@ -2,7 +2,7 @@
     <p><img src="https://github.com/kokoabim/vscode-extension-template/blob/main/icon/extension-512.png?raw=true" alt="logo" width="240"></p>
     <p>Visual Studio Code Extension Creator</p>
 </h1>
-<h3 align="center">Create your own Visual Studio Code extensions</h3>
+<h3 align="center">Create and publish your own Visual Studio Code extensions</h3>
 
 # Requirements
 

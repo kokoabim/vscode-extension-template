@@ -1,6 +1,6 @@
 {
     "name": "extension-creator",
-    "publisher": "spencer.james",
+    "publisher": "spencerjames",
     "version": "0.0.1",
     "description": "Create your own Visual Studio Code extensions",
     "displayName": "VSCode Extension Project Creator",

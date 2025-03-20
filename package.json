@@ -2,9 +2,9 @@
     "name": "extension-creator",
     "publisher": "spencerjames",
     "version": "0.0.2",
-    "description": "Create your own Visual Studio Code extensions",
-    "displayName": "VSCode Extension Project Creator",
-    "shortName": "Extension Project Creator",
+    "description": "Create and publish your own Visual Studio Code extensions",
+    "displayName": "VSCode Extension Creator",
+    "shortName": "Extension Creator",
     "author": {
         "name": "Spencer James",
         "email": "apps@swsj.me",

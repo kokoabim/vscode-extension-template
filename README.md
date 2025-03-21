@@ -20,7 +20,7 @@ There are a few options to get started.
 This is option is the easiest, most convenient and will always use the latest template.
 
 1. Install this extension: https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator
-2. Use its `Create New VSCode Extension...` command.
+2. Use its `Create New VSCode Extension...` command or [Create VS Code Extension] button on Explorer Side Bar (visible when no folder is open).
 3. Fill in the prompts.
 4. Open new extension directory in Visual Studio Code.
 5. Modify the `./package.json` file with appropriate values: description, author, etc.

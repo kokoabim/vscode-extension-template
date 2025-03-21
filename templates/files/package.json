@@ -1,7 +1,7 @@
 {
     "name": "change-me",
     "publisher": "change-me",
-    "version": "0.0.2",
+    "version": "0.0.1",
     "description": "Change Me",
     "displayName": "Change Me",
     "shortName": "",
@@ -23,9 +23,7 @@
     "engines": {
         "vscode": "^1.96.0"
     },
-    "categories": [
-        "Other"
-    ],
+    "categories": [],
     "keywords": [],
     "activationEvents": [],
     "main": "./dist/extension.js",

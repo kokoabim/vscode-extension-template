@@ -1,7 +1,7 @@
 {
     "name": "extension-creator",
     "publisher": "spencerjames",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Create and publish your own Visual Studio Code extensions",
     "displayName": "VSCode Extension Creator",
     "shortName": "Extension Creator",
@@ -24,15 +24,20 @@
         "vscode": "^1.96.0"
     },
     "categories": [
-        "Snippets",
         "Programming Languages",
+        "Snippets",
+        "Testing",
         "Education"
     ],
     "keywords": [
         "vscode",
         "extension",
         "template",
-        "project"
+        "project",
+        "create",
+        "publish",
+        "typescript",
+        "vsce"
     ],
     "activationEvents": [],
     "main": "./dist/extension.js",
@@ -56,6 +61,13 @@
             {
                 "command": "extension-creator.hello-world",
                 "title": "Hello World"
+            }
+        ],
+        "viewsWelcome": [
+            {
+                "view": "explorer",
+                "contents": "Create a new Visual Studio Code extension project.\n\n[Learn more](https://github.com/kokoabim/vscode-extension-template/blob/main/README.md) about creating, testing and publishing VS Code extensions.\n[Create VS Code Extension](command:extension-creator.create-new-extension-project)",
+                "when": "workspaceFolderCount == 0"
             }
         ]
     },

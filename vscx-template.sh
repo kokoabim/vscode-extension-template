@@ -220,7 +220,7 @@ if [[ "$script_action" == "project" ]]; then
     echo "Updating project files..."
     pushd "$ext_directory" >/dev/null
 
-    jq ".displayName = \"$ext_display_name\" | .name = \"$ext_name\" | .publisher = \"$ext_publisher\"" package.json >package.json.tmp
+    jq ".displayName = \"$ext_display_name\" | .name = \"$ext_name\" | .publisher = \"$ext_publisher\" | .contributes.configuration.title = \"$ext_display_name\"" package.json >package.json.tmp
     mv package.json.tmp package.json
 
     sed -i '' "s/change-me/$ext_id/g" package.json

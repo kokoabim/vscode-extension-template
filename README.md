@@ -94,7 +94,7 @@ This uses `vscode-test` and `test-cli`. See https://github.com/microsoft/vscode-
 
 ### 👀 Watching
 
-There is a task in the `./.vscode/tasks.json` file that will run automatically when the project is opened. This runs the package's `watch` script which run `tsc -watch`. Its output is viewable in the Terminal panel.
+There is a task in the `./.vscode/tasks.json` file that will run automatically when the project is opened. This runs the package's `watch` script which runs `tsc -watch`. Its output is viewable in the Terminal panel.
 
 # 🛠️ Included Command-Line Tools
 

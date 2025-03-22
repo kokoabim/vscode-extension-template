@@ -3,6 +3,8 @@
     <p>Visual Studio Code Extension Creator</p>
 </h1>
 <h3 align="center">Create and publish your own Visual Studio Code extensions</h3>
+</p>
+<p align="center"><a href="https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator"><img src="https://vsmarketplacebadges.dev/version/spencerjames.extension-creator.svg?label=VSCode%20Extension%20Creator"></a></p>
 
 # 📦 Requirements
 

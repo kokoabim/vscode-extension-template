@@ -29,7 +29,7 @@
 set -eo pipefail
 
 script_name="${0##*/}"
-script_ver="1.0"
+script_ver="1.0.1"
 script_title="Visual Studio Code Extension Template"
 script_options="f:"
 script_switches="chioy"
@@ -70,29 +70,30 @@ function end() {
     local end_code=${2:-$e}
 
     if [[ "$end_message" != "" ]]; then
-        if [ $end_code -ne 0 ]; then
+        if [ "$end_code" -ne 0 ]; then
             text_red "$script_name" >&2
             echo -n ": " >&2
         fi
         echo "$end_message" >&2
     fi
 
-    exit $end_code
+    exit "$end_code"
 }
 trap end EXIT SIGHUP SIGINT SIGQUIT SIGTERM
 
 function text_ansi() {
     local code=$1
     shift
-    echo -en "\033[${code}m$@\033[0m"
+    echo -en "\033[${code}m$*\033[0m"
 }
 function text_red() { text_ansi 31 "$@"; }
 function text_underline() { text_ansi 4 "$@"; }
 
+# shellcheck disable=SC2120
 function confirm_run() {
     [[ ${yes:-0} -eq 1 ]] && return
 
-    read -p "${1:-Continue}? [y/N] " -n 1
+    read -r -p "${1:-Continue}? [y/N] " -n 1
     [[ $REPLY == "" ]] && echo -en "\033[1A"
     echo
     [[ $REPLY =~ ^[Yy]$ ]] || end
@@ -125,7 +126,7 @@ while getopts "${script_options}${script_switches}" OPTION; do
     *) usage ;;
     esac
 done
-shift $(($OPTIND - 1))
+shift $((OPTIND - 1))
 
 [[ "$1" != "" ]] || usage
 script_action=$1
@@ -169,7 +170,7 @@ else # create
     if [[ $create_versioned_file -eq 1 ]]; then
         [[ -f "$pkg_json_file" ]] || end "File not found: $pkg_json_file" 1
         pkg_version=$(jq -r '.version' package.json)
-        [[ "$pkg_version" == "" || "$pkg_version" == "null" ]] && end "Failed to get version from $pkg_json_file" 1 || true
+        ([[ "$pkg_version" == "" || "$pkg_version" == "null" ]] && end "Failed to get version from $pkg_json_file" 1) || true
 
         template_versioned_file="$(realpath $templates_directory)/vscx-template-v$pkg_version.zip"
         [[ -f "$template_versioned_file" && $overwrite -eq 0 ]] && end "File already exists (use -o to overwrite): $template_versioned_file" 1
@@ -278,6 +279,7 @@ elif [[ "$script_action" == "create" ]]; then
         -x "releases/*" \
         -x "templates/*" \
         -x "vscx-template.sh" \
+        -x "webviews/*" \
         -x "src/Utilities/*" \
         -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts" \
         -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts" \

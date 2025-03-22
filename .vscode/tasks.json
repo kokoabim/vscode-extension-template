@@ -16,7 +16,7 @@
             "problemMatcher": "$tsc-watch",
             "isBackground": true,
             "presentation": {
-                "reveal": "never"
+                "reveal": "silent"
             },
             "runOptions": {
                 "runOn": "folderOpen"

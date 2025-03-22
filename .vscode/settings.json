@@ -6,8 +6,10 @@
         "dist": true
     },
     "cSpell.words": [
+        "NOSONAR",
         "npmx",
         "Tribool",
+        "vscodeignore",
         "vscx"
     ]
 }

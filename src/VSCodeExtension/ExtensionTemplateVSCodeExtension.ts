@@ -46,6 +46,45 @@ export class ExtensionTemplateVSCodeExtension extends VSCodeExtension {
     // TEMPLATE-REMOVE-START
     private createCreateNewExtensionProjectCommand(): VSCodeCommand {
         return new VSCodeCommand("extension-creator.create-new-extension-project", async () => {
+
+            /*const panel = vscode.window.createWebviewPanel(
+                "extension-creator.new-vscode-extension-project",
+                "Visual Studio Code Extension Creator",
+                vscode.ViewColumn.One,
+                {
+                    enableCommandUris: true,
+                    enableScripts: true,
+                    localResourceRoots: [this.context.extensionUri],
+                    enableForms: true,
+                }
+            );
+
+            const scriptUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extension.extensionUri, "webviews", "new-vscode-extension-project", "main.js"));
+            const styleMainUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extension.extensionUri, "webviews", "new-vscode-extension-project", "main.css"));
+            const styleVSCodeUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extension.extensionUri, 'webviews', "vscode.css"));
+            const nonce = getNonce();
+
+            panel.webview.html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${panel.webview.cspSource}; script-src 'nonce-${nonce}'; font-src ${panel.webview.cspSource};">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <link href="${styleVSCodeUri}" rel="stylesheet">
+    <link href="${styleMainUri}" rel="stylesheet">
+</head>
+<body>
+    <h1>Create Visual Studio Code Extension</h1>
+    <hr />
+
+    <script src="${scriptUri}" nonce="${nonce}"></script>
+</body>
+</html>
+`;
+
+            panel.reveal();*/
+
             const projectSettings = await this.promptForExtensionProjectSettings();
             if (!projectSettings) return;
 
@@ -95,3 +134,14 @@ export class ExtensionTemplateVSCodeExtension extends VSCodeExtension {
     }
     // TEMPLATE-REMOVE-END
 }
+
+// TEMPLATE-REMOVE-START
+/*function getNonce(): string {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}*/
+// TEMPLATE-REMOVE-END

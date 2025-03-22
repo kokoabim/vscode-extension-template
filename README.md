@@ -4,14 +4,14 @@
 </h1>
 <h3 align="center">Create and publish your own Visual Studio Code extensions</h3>
 
-# Requirements
+# 📦 Requirements
 
 -   Visual Studio Marketplace account: https://marketplace.visualstudio.com/manage
 -   Visual Studio Code: https://code.visualstudio.com/download
 -   Node.js: https://nodejs.org/en/download/
 -   Visual Studio Code Extensions (`vsce`) command-line tool: Run `npm install -g @vscode/vsce`
 
-# Getting Started
+# 🎬 Getting Started
 
 There are a few options to get started.
 
@@ -50,13 +50,35 @@ If you're not in VSCode with this extension installed, you can clone this extens
 4. Modify source files (Find in Files: `change-me`) with your extension's name.
 5. Address all TODOs in source files (Find in Files: `TODO`) as appropriate.
 
-# Debugging and Testing
+# 📂 Project Structure
 
-### Debugging
+| Dir/File                | Description                                             |
+| ----------------------- | ------------------------------------------------------- |
+| `.vscode/`              | VS Code settings and configurations                     |
+| `dist/`                 | Compiled TypeScript files                               |
+| `node_modules/`         | NPM dependencies                                        |
+| `releases/`             | `.vsix` files for release                               |
+| `src/`                  | Source files                                            |
+| `src/test/`             | Test files                                              |
+| `.vscode-test.mjs`      | Configuration for `vscode-test`                         |
+| `.vscodeignore`         | Files/directories to ignore when creating `.vsix` files |
+| `CHANGELOG.md`          | Changelog for the extension                             |
+| `eslint.config.mjs`     | ESLint configuration                                    |
+| `LICENSE.md`            | License file                                            |
+| `npmx.sh`               | Command-line tool for NPM tasks                         |
+| `package.json`          | Extension manifest and NPM dependencies                 |
+| `README.md`             | This file                                               |
+| `tsconfig.json`         | TypeScript configuration                                |
+| `tsconfig.publish.json` | TypeScript configuration used for publishing            |
+| `vscx.sh`               | Command-line tool for creating `.vsix` files            |
+
+# 🧑🏼‍💻 Debugging, Testing and Watching
+
+### 🐛 Debugging
 
 There is a `Debug Extension` launch configuration in the `./.vscode/launch.json` file. This configuration will launch a new instance of Visual Studio Code with the extension loaded.
 
-### Testing
+### 🧪 Testing
 
 There is a sample `./src/test/extension.test.ts` file that contains a simple test. You can add tests to this file or create new test files in the `./src/test/` directory with a `.test.ts` extension. You can include addition test file naming conventions by modifying the `files` property in the `./vscode-test.mjs` file.
 
@@ -70,7 +92,11 @@ There is three ways to run the tests:
 
 This uses `vscode-test` and `test-cli`. See https://github.com/microsoft/vscode-test, https://github.com/microsoft/vscode-test-cli and https://code.visualstudio.com/api/working-with-extensions/testing-extension for more information.
 
-# Included Command-Line Tools
+### 👀 Watching
+
+There is a task in the `./.vscode/tasks.json` file that will run automatically when the project is opened. This runs the package's `watch` script which run `tsc -watch`. Its output is viewable in the Terminal panel.
+
+# 🛠️ Included Command-Line Tools
 
 A couple of tools are included in this repository to help with development, testing and publishing.
 
@@ -95,7 +121,7 @@ Use the `-h` switch to view help information for each tool.
 -   Uses global `vsce` NPM tool to create `.vsix` files.
 -   Note: `vsce` calls `./package.json` `vscode:prepublish` script during its process which in turn calls `./npmx.sh`.
 
-# Before Publishing
+# 📝 Before Publishing
 
 _Brand_ your extension.
 
@@ -104,7 +130,7 @@ _Brand_ your extension.
 3. Modify the `./CHANGELOG.md` file to match your extension. This is what is displayed on the extension's Visual Studio Marketplace page.
 4. Install the extension locally and try to break it. See below `./vscx.sh pub-install` command for more information.
 
-# Publishing
+# 🚀 Publishing
 
 ### Create `.vsix` file
 

@@ -1,5 +1,9 @@
 ## ⍺ Alpha
 
+#### 2025-03-22 — 0.0.6
+
+-   Fixed broken Explorer Side Bar button.
+
 #### 2025-03-22 — 0.0.5
 
 -   Added a panel webview form for user to enter new VS Code extension project settings, which replaces the previously used input boxes.

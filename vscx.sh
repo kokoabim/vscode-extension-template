@@ -29,7 +29,7 @@
 set -eo pipefail
 
 script_name="${0##*/}"
-script_ver="1.1"
+script_ver="1.1.1"
 script_title="Visual Studio Code Extension Management"
 script_options="d:"
 script_switches="hoxy"
@@ -153,6 +153,8 @@ if [[ "$script_action" == "install" ]]; then
     pkg_file="$2"
 
     [[ -f "$pkg_file" ]] || end "File not found: $pkg_file" 1
+
+    pkg_directory=
 else
     # all other actions (other than "install")
 

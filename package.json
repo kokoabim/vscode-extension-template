@@ -1,15 +1,10 @@
 {
     "name": "extension-creator",
     "publisher": "spencerjames",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Create and publish your own Visual Studio Code extensions",
     "displayName": "VSCode Extension Creator",
     "shortName": "Extension Creator",
-    "author": {
-        "name": "Spencer James",
-        "email": "apps@swsj.me",
-        "url": "https://swsj.me/"
-    },
     "homepage": "https://github.com/kokoabim/vscode-extension-template",
     "bugs": {
         "url": "https://github.com/kokoabim/vscode-extension-template/issues"
@@ -18,7 +13,7 @@
         "type": "git",
         "url": "https://github.com/kokoabim/vscode-extension-template"
     },
-    "license": "LICENSE.md",
+    "license": "SEE LICENSE IN LICENSE.md",
     "icon": "icon/extension-512.png",
     "engines": {
         "vscode": "^1.96.0"
@@ -54,19 +49,14 @@
         },
         "commands": [
             {
-                "category": "Extension Creator",
-                "command": "extension-creator.create-new-extension-project",
-                "title": "Create New VSCode Extension..."
-            },
-            {
-                "command": "extension-creator.hello-world",
-                "title": "Hello World"
+                "command": "extension-creator.open-new-extension-project-panel",
+                "title": "Create Visual Studio Code Extension..."
             }
         ],
         "viewsWelcome": [
             {
                 "view": "explorer",
-                "contents": "Create a new Visual Studio Code extension project.\n\n[Learn more](https://github.com/kokoabim/vscode-extension-template/blob/main/README.md) about creating, testing and publishing VS Code extensions.\n[Create VS Code Extension](command:extension-creator.create-new-extension-project)",
+                "contents": "Create a Visual Studio Code extension project.\n\n[Learn more](https://github.com/kokoabim/vscode-extension-template/blob/main/README.md) about creating, testing and publishing Visual Studio Code extensions.\n[Create VS Code Extension](command:extension-creator.create-new-extension-project)",
                 "when": "workspaceFolderCount == 0"
             }
         ]
@@ -87,10 +77,16 @@
         "@vscode/test-cli": "^0.0.10",
         "@vscode/test-electron": "^2.4.1",
         "eslint": "^9.23.0",
-        "typescript": "^5.8.2"
+        "ts-loader": "^9.5.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.2",
+        "webpack": "^5.97.1",
+        "webpack-cli": "^6.0.1"
     },
     "dependencies": {
         "@types/vscode": "^1.96.0",
+        "@vscode-elements/elements": "^1.14.0",
+        "@vscode/codicons": "^0.0.36",
         "extract-zip": "^2.0.1"
     }
 }

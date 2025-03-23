@@ -17,22 +17,22 @@ export class VSCodeExtensionProjectGenerator {
             return false;
         }
 
-        if (settings.displayName === undefined || settings.publisher === undefined || settings.directory === undefined) {
+        if (!settings.displayName || !settings.publisher || !settings.directory) {
             await this.output.modalError("Missing settings", "Missing 'displayName', 'publisher' or 'directory' in extension project settings.");
             return false;
         }
 
-        settings.name = settings.displayName!.replaceAll(" ", "-").toLowerCase().replaceAll(/[^a-z0-9-._~]+/g, "");
+        if (!settings.name) settings.name = settings.displayName.replaceAll(" ", "-").toLowerCase().replaceAll(/[^a-z0-9\-._~]+/g, "");
         settings.id = `${settings.publisher}.${settings.name}`;
-        settings.directory = this.fileSystem.joinPath(settings.directory, settings.name);
+        settings.directory = this.fileSystem.joinPath(settings.directory, "vscode-" + settings.name);
 
-        const fsEntryTypeAtProjectPath = await this.fileSystem.getEntryType(settings.directory!);
+        const fsEntryTypeAtProjectPath = await this.fileSystem.getEntryType(settings.directory);
         if (fsEntryTypeAtProjectPath === FsEntryType.directory || fsEntryTypeAtProjectPath === FsEntryType.file || fsEntryTypeAtProjectPath === FsEntryType.symbolicLink) {
             if ("Yes" !== await this.output.modalWarning(`${fsEntryTypeAtProjectPath} exists`, `Would you like to overwrite '${settings.directory}'?`, "Yes", "No")) {
                 return false;
             }
 
-            const deleted = await this.fileSystem.removeDirectory(settings.directory!);
+            const deleted = await this.fileSystem.removeDirectory(settings.directory);
             if (!deleted) {
                 this.output.error(`Failed to delete directory: ${settings.directory}`);
                 return false;
@@ -43,19 +43,19 @@ export class VSCodeExtensionProjectGenerator {
             return false;
         }
 
-        const createdDirectory = await this.fileSystem.createDirectory(settings.directory!);
+        const createdDirectory = await this.fileSystem.createDirectory(settings.directory);
         if (!createdDirectory) {
             this.output.error(`Failed to create directory: ${settings.directory}`);
             return false;
         }
 
-        const unzipped = await this.fileSystem.unzip(this.latestTemplatePath, settings.directory!);
+        const unzipped = await this.fileSystem.unzip(this.latestTemplatePath, settings.directory);
         if (!unzipped) {
             this.output.modalError("Failed", "Failed to unzip template to directory.");
             return false;
         }
 
-        const packageJsonPath = this.fileSystem.joinPath(settings.directory!, "package.json");
+        const packageJsonPath = this.fileSystem.joinPath(settings.directory, "package.json");
         const packageJsonManuallyEditMessage = "You will have to manually edit the package.json file to set the 'description', 'displayName', 'name' and 'publisher' properties.";
 
         const packageJson = await this.fileSystem.readJsonFile<any>(packageJsonPath);
@@ -64,10 +64,12 @@ export class VSCodeExtensionProjectGenerator {
             // NOTE: continue on error
         }
         else {
-            packageJson.description = settings.description || "Change Me";
+            packageJson.description = settings.description ?? "Change Me";
             packageJson.displayName = settings.displayName;
             packageJson.name = settings.name;
             packageJson.publisher = settings.publisher;
+            if (settings.version) packageJson.version = settings.version;
+            packageJson.contributes.configuration.title = settings.displayName;
 
             const packageJsonSaved = await this.fileSystem.writeFile(packageJsonPath, packageJson, true);
             if (!packageJsonSaved) {
@@ -78,8 +80,8 @@ export class VSCodeExtensionProjectGenerator {
 
         const filesToReplaceIn = [
             packageJsonPath,
-            this.fileSystem.joinPath(settings.directory!, "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"),
-            this.fileSystem.joinPath(settings.directory!, "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts")
+            this.fileSystem.joinPath(settings.directory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"),
+            this.fileSystem.joinPath(settings.directory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts")
         ];
 
         for (const fileToReplaceIn of filesToReplaceIn) {
@@ -105,6 +107,9 @@ export interface ExtensionProjectSettings {
     directory?: string;
     displayName?: string;
     id?: string;
+    installDependencies?: boolean;
     name?: string;
+    openInVSCode?: boolean;
     publisher?: string;
+    version?: string;
 }

@@ -5,11 +5,6 @@
     "description": "Change Me",
     "displayName": "Change Me",
     "shortName": "",
-    "author": {
-        "name": "",
-        "email": "",
-        "url": ""
-    },
     "homepage": "",
     "bugs": {
         "url": ""
@@ -18,7 +13,7 @@
         "type": "",
         "url": ""
     },
-    "license": "LICENSE.md",
+    "license": "SEE LICENSE IN LICENSE.md",
     "icon": "",
     "engines": {
         "vscode": "^1.96.0"

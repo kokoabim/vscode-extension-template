@@ -6,6 +6,8 @@
 </p>
 <p align="center"><a href="https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator"><img src="https://vsmarketplacebadges.dev/version/spencerjames.extension-creator.svg?label=VSCode%20Extension%20Creator"></a></p>
 
+<p align="center"><img src="https://github.com/kokoabim/vscode-extension-template/blob/main/images/settings-form.png?raw=true" alt="logo" width="600"></p>
+
 # 📦 Requirements
 
 -   Visual Studio Marketplace account: https://marketplace.visualstudio.com/manage
@@ -22,8 +24,8 @@ There are a few options to get started.
 This is option is the easiest, most convenient and will always use the latest template.
 
 1. Install this extension: https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator
-2. Use its `Create New VSCode Extension...` command or [Create VS Code Extension] button on Explorer Side Bar (visible when no folder is open).
-3. Fill in the prompts.
+2. Use its `Create Visual Studio Code Extension...` command or [Create VS Code Extension] button on Explorer Side Bar (visible when no folder is open).
+3. Enter the extension project settings in the form and click `Create`.
 4. Open new extension directory in Visual Studio Code.
 5. Modify the `./package.json` file with appropriate values: description, author, etc.
     - See https://code.visualstudio.com/api/references/extension-manifest for more information.

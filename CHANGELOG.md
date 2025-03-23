@@ -1,5 +1,9 @@
 ## ⍺ Alpha
 
+#### 2025-03-22 — 0.0.5
+
+-   Added a panel webview form for user to enter new VS Code extension project settings, which replaces the previously used input boxes.
+
 #### 2025-03-21 — 0.0.4
 
 -   Changes underneath, and not yet functional, in preparation of a future change to use a webview form for user to enter properties of a new VS Code extension project (instead of the currently used input boxes) for a more user-friendly experience.

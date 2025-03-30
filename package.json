@@ -1,17 +1,17 @@
 {
     "name": "extension-creator",
     "publisher": "spencerjames",
-    "version": "0.0.6",
+    "version": "0.1.0",
     "description": "Create and publish your own Visual Studio Code extensions",
-    "displayName": "VSCode Extension Creator",
+    "displayName": "VS Code Extension Creator",
     "shortName": "Extension Creator",
-    "homepage": "https://github.com/kokoabim/vscode-extension-template",
+    "homepage": "https://github.com/kokoabim/vscode-extension-template/blob/main/README.md",
     "bugs": {
         "url": "https://github.com/kokoabim/vscode-extension-template/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/kokoabim/vscode-extension-template"
+        "url": "https://github.com/kokoabim/vscode-extension-template.git"
     },
     "license": "SEE LICENSE IN LICENSE.md",
     "icon": "icon/extension-512.png",
@@ -32,7 +32,9 @@
         "create",
         "publish",
         "typescript",
-        "vsce"
+        "vsce",
+        "vs",
+        "code"
     ],
     "activationEvents": [],
     "main": "./dist/extension.js",
@@ -40,30 +42,69 @@
         "configuration": {
             "title": "Extension Creator",
             "properties": {
-                "extension-creator.yourName": {
+                "extension-creator.publisherID": {
                     "type": "string",
-                    "default": "World",
-                    "markdownDescription": "What is _your_ name?"
+                    "markdownDescription": "Your Visual Studio Marketplace publisher identifier. [Manage](https://marketplace.visualstudio.com/manage/publishers) your publishers and extensions."
+                },
+                "extension-creator.projectParentDirectory": {
+                    "type": "string",
+                    "markdownDescription": "Parent directory where a new extension project directory is saved.",
+                    "default": "%HOME%/Projects"
+                },
+                "extension-creator.overwriteProjectDestinationPath": {
+                    "type": "boolean",
+                    "markdownDescription": "Overwrite project directory destination path (if file or directory exists).",
+                    "default": false
+                },
+                "extension-creator.installNPMDependencies": {
+                    "type": "boolean",
+                    "markdownDescription": "Install NPM package dependencies after creating a new extension project.",
+                    "default": true
+                },
+                "extension-creator.openInVSCode": {
+                    "type": "boolean",
+                    "markdownDescription": "Open extension project after creation.",
+                    "default": true
+                },
+                "extension-creator.packageOutputDirectory": {
+                    "type": "string",
+                    "markdownDescription": "Output directory where a built extension package is saved.",
+                    "default": "${workspaceFolder}/releases"
+                },
+                "extension-creator.overwritePackageDestinationPath": {
+                    "type": "boolean",
+                    "markdownDescription": "Overwrite package file destination path (if file or directory exists).\n\n**Note:** Package file names, by default, have a suffix of the package version number so the package of the same version is overwritten.",
+                    "default": false
+                },
+                "extension-creator.installExtension": {
+                    "type": "boolean",
+                    "markdownDescription": "Install extension packages after packaging. Use this to test extensions after installed.\n\n**Note:** This will uninstall any previous version of the extension if it is already installed. Also, uninstall locally installed extensions after testing (to later install the official releases from the marketplace).",
+                    "default": false
                 }
             }
         },
         "commands": [
             {
-                "command": "extension-creator.open-new-extension-project-panel",
+                "command": "extension-creator.create-extension",
                 "title": "Create Visual Studio Code Extension..."
+            },
+            {
+                "command": "extension-creator.package-extension",
+                "title": "Package Visual Studio Code Extension...",
+                "when": "workspaceFolderCount !== 0"
             }
         ],
         "viewsWelcome": [
             {
                 "view": "explorer",
-                "contents": "Create a Visual Studio Code extension project.\n\n[Learn more](https://github.com/kokoabim/vscode-extension-template/blob/main/README.md) about creating, testing and publishing Visual Studio Code extensions.\n[Create VS Code Extension](command:extension-creator.open-new-extension-project-panel)",
-                "when": "workspaceFolderCount == 0"
+                "contents": "Create a Visual Studio Code extension project.\n\n[Learn more](https://github.com/kokoabim/vscode-extension-template/blob/main/README.md) about creating, testing and publishing Visual Studio Code extensions.\n[Create VS Code Extension](command:extension-creator.create-extension)",
+                "when": "workspaceFolderCount === 0"
             }
         ]
     },
     "scripts": {
-        "compile": "tsc -p ./tsconfig.json",
-        "install-compile": "./npmx.sh -bcy install",
+        "compile": "./build-webviews.sh -y && ./npmx.sh -cy compile",
+        "install-compile": "./build-webviews.sh -y && ./npmx.sh -bcy install",
         "lint": "eslint ./src",
         "pretest": "./npmx.sh -cly install",
         "test": "vscode-test",
@@ -72,8 +113,8 @@
     },
     "devDependencies": {
         "@types/node": "^22.x",
-        "@typescript-eslint/eslint-plugin": "^8.26.1",
-        "@typescript-eslint/parser": "^8.26.1",
+        "@typescript-eslint/eslint-plugin": "^8.28.0",
+        "@typescript-eslint/parser": "^8.28.0",
         "@vscode/test-cli": "^0.0.10",
         "@vscode/test-electron": "^2.4.1",
         "eslint": "^9.23.0",
@@ -84,9 +125,9 @@
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
+        "@vscode/codicons": "^0.0.36",
         "@types/vscode": "^1.96.0",
         "@vscode-elements/elements": "^1.14.0",
-        "@vscode/codicons": "^0.0.36",
         "extract-zip": "^2.0.1"
     }
 }

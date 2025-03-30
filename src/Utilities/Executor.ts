@@ -3,7 +3,7 @@ import { StringBuilder } from "./StringBuilder";
 import { VSCodeExtensionUI } from "../VSCodeExtension/VSCodeExtensionUI";
 
 export class Executor {
-    public async exec(command: string, cwd: string, execOutput = ExecutorExecOutput.none, output?: VSCodeExtensionUI): Promise<ExecutorExecResult> {
+    public async exec(command: string, cwd?: string, execOutput = ExecutorExecOutput.none, output?: VSCodeExtensionUI): Promise<ExecutorExecResult> {
         let childProcess: ChildProcess;
         const stdOut = new StringBuilder();
         const stdErr = new StringBuilder();
@@ -14,7 +14,7 @@ export class Executor {
         let outputStdOut: ((data: string) => void) | undefined = undefined;
         let outputStdErr: ((data: string) => void) | undefined = undefined;
 
-        const execResult: ExecutorExecResult = {};
+        const execResult: ExecutorExecResult = { success: false };
 
         try {
             childProcess = exec(command, { encoding: "utf8", maxBuffer: 5120000, cwd: cwd });
@@ -40,20 +40,16 @@ export class Executor {
                 if (outputStdErr) childProcess.stderr!.on("data", outputStdErr);
             }
 
-            const [code, signal] = await new Promise<[number | null, NodeJS.Signals | null]>(resolve => childProcess.on("close", (code, signal) => resolve([code, signal])));
-            execResult.code = code;
+            const [exitCode, signal] = await new Promise<[number | null, NodeJS.Signals | null]>(resolve => childProcess.on("close", (code, signal) => resolve([code, signal])));
+            execResult.exitCode = exitCode;
             execResult.signal = signal;
-            execResult.success = code === 0;
+            execResult.success = exitCode === 0;
         }
         catch (error) {
             const errorMessage = "Error executing command: " + error;
+            execResult.error = errorMessage;
 
-            if (execOutput === ExecutorExecOutput.outputChannel) {
-                output!.channelOutputLine(errorMessage);
-            }
-            else {
-                execResult.error = errorMessage;
-            }
+            if (execOutput === ExecutorExecOutput.outputChannel) output!.channelOutputLine(errorMessage);
         }
 
         if ((execOutput === ExecutorExecOutput.string || execOutput === ExecutorExecOutput.strings) && outputStdOut && outputStdErr) {
@@ -76,11 +72,24 @@ export enum ExecutorExecOutput {
 }
 
 export interface ExecutorExecResult {
-    success?: boolean;
-    code?: number | null;
+    /** `true` if the command was executed successfully and exited with exit code 0. */
+    success: boolean;
+
+    /** Exit code of the command. */
+    exitCode?: number | null;
+
+    /** Signal that terminated the command. */
     signal?: string | null;
+
+    /** Error executing command. */
     error?: string | undefined;
+
+    /** All output (stdout and stderror) of the command. */
     output?: string | undefined;
+
+    /** Standard output of the command. */
     stdOut?: string | undefined;
+
+    /** Standard error output of the command. */
     stdErr?: string | undefined;
 };

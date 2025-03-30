@@ -1,115 +1,168 @@
+import { TriBoolean } from "../Types/TriBoolean";
 import { VSCodeExtensionUI } from "../VSCodeExtension/VSCodeExtensionUI";
 import { Executor, ExecutorExecOutput } from "./Executor";
 import { FileSystem, FsEntryType } from "./FileSystem";
+
+export interface ExtensionProjectGenerateSettings {
+    className?: string;
+    description?: string;
+    displayName?: string;
+    installNpmDependencies?: boolean;
+    name?: string;
+    openInVSCode?: boolean;
+    overwriteProjectDestinationPath?: boolean;
+    parentDirectory?: string;
+    projectDirectory?: string;
+    publisher?: string;
+    version?: string;
+}
 
 export class VSCodeExtensionProjectGenerator {
     private readonly executor = new Executor();
     private readonly fileSystem = new FileSystem();
     private readonly latestTemplatePath: string;
 
-    constructor(private readonly output: VSCodeExtensionUI, private readonly templatesDirectory: string) {
+    constructor(private readonly output: VSCodeExtensionUI, templatesDirectory: string) {
         this.latestTemplatePath = this.fileSystem.joinPath(templatesDirectory, "vscx-template-latest.zip");
     }
 
-    public async createNewExtensionProject(settings: ExtensionProjectSettings): Promise<boolean> {
+    /** Generates a new VSCode extension project using the included latest template file. */
+    public async generateExtensionProject(generateSettings: ExtensionProjectGenerateSettings): Promise<TriBoolean> {
         if (!await this.fileSystem.fileExists(this.latestTemplatePath)) {
-            await this.output.modalError("Template not found", `Unable to find template at: ${this.latestTemplatePath}`);
+            await this.output.modalError("Template not found", `Unable to find template: ${this.latestTemplatePath}`);
             return false;
         }
 
-        if (!settings.displayName || !settings.publisher || !settings.directory) {
-            await this.output.modalError("Missing settings", "Missing 'displayName', 'publisher' or 'directory' in extension project settings.");
+        if (!generateSettings.displayName || !generateSettings.parentDirectory || !generateSettings.publisher) {
+            await this.output.modalError("Missing settings", "Missing 'displayName', 'parentDirectory' or 'publisher' in extension project generate settings.");
             return false;
         }
 
-        if (!settings.name) settings.name = settings.displayName.replaceAll(" ", "-").toLowerCase().replaceAll(/[^a-z0-9\-._~]+/g, "");
-        settings.id = `${settings.publisher}.${settings.name}`;
-        settings.directory = this.fileSystem.joinPath(settings.directory, "vscode-" + settings.name);
+        if (!generateSettings.name) generateSettings.name = generateSettings.displayName.toLowerCase().replaceAll(/ +/g, "-").replaceAll(/[^a-z0-9\-._]/g, "").replaceAll(/-{2,}/g, "-").replaceAll(/^[-._]+|[-._]+$/g, "");
+        generateSettings.projectDirectory = this.fileSystem.joinPath(generateSettings.parentDirectory, "vscode-" + generateSettings.name);
 
-        const fsEntryTypeAtProjectPath = await this.fileSystem.getEntryType(settings.directory);
+        const fsEntryTypeAtProjectPath = await this.fileSystem.getEntryType(generateSettings.projectDirectory);
         if (fsEntryTypeAtProjectPath === FsEntryType.directory || fsEntryTypeAtProjectPath === FsEntryType.file || fsEntryTypeAtProjectPath === FsEntryType.symbolicLink) {
-            if ("Yes" !== await this.output.modalWarning(`${fsEntryTypeAtProjectPath} exists`, `Would you like to overwrite '${settings.directory}'?`, "Yes", "No")) {
+            if (generateSettings.overwriteProjectDestinationPath !== true && "Yes" !== await this.output.modalWarning(`${fsEntryTypeAtProjectPath} exists`, `Would you like to overwrite '${generateSettings.projectDirectory}'?`, "Yes", "No")) {
                 return false;
             }
 
-            const deleted = await this.fileSystem.removeDirectory(settings.directory);
+            const deleted = await this.fileSystem.removeEntry(generateSettings.projectDirectory);
             if (!deleted) {
-                this.output.error(`Failed to delete directory: ${settings.directory}`);
+                this.output.error(`Failed to delete: ${generateSettings.projectDirectory}`);
                 return false;
             }
         }
         else if (fsEntryTypeAtProjectPath !== FsEntryType.none) {
-            await this.output.modalWarning(`${fsEntryTypeAtProjectPath} exists`, "Unable to continue due to file system entry type.");
+            await this.output.modalWarning(`${fsEntryTypeAtProjectPath} exists`, `Unable to continue due to file system entry type that exists at project directory: ${generateSettings.projectDirectory}`);
             return false;
         }
 
-        const createdDirectory = await this.fileSystem.createDirectory(settings.directory);
+        const createdDirectory = await this.fileSystem.createDirectory(generateSettings.projectDirectory);
         if (!createdDirectory) {
-            this.output.error(`Failed to create directory: ${settings.directory}`);
+            this.output.error(`Failed to create directory: ${generateSettings.projectDirectory}`);
             return false;
         }
 
-        const unzipped = await this.fileSystem.unzip(this.latestTemplatePath, settings.directory);
+        const unzipped = await this.fileSystem.unzip(this.latestTemplatePath, generateSettings.projectDirectory);
         if (!unzipped) {
             this.output.modalError("Failed", "Failed to unzip template to directory.");
             return false;
         }
 
-        const packageJsonPath = this.fileSystem.joinPath(settings.directory, "package.json");
-        const packageJsonManuallyEditMessage = "You will have to manually edit the package.json file to set the 'description', 'displayName', 'name' and 'publisher' properties.";
+        // NOTE: from here on, return will be true or partial.
+        let result: TriBoolean = true;
 
-        const packageJson = await this.fileSystem.readJsonFile<any>(packageJsonPath);
-        if (!packageJson) {
-            this.output.modalError("Failed to read package.json", packageJsonManuallyEditMessage);
+        const extensionManifestPath = this.fileSystem.joinPath(generateSettings.projectDirectory, "package.json");
+        const packageJsonManuallyEditMessage = "You will need to edit the 'package.json' file.";
+
+        const extensionManifest = await this.fileSystem.readJsonFile<any>(extensionManifestPath);
+        if (!extensionManifest) {
+            result = "partial";
+            this.output.modalError("Failed to read extension manifest", packageJsonManuallyEditMessage);
             // NOTE: continue on error
         }
         else {
-            packageJson.description = settings.description ?? "Change Me";
-            packageJson.displayName = settings.displayName;
-            packageJson.name = settings.name;
-            packageJson.publisher = settings.publisher;
-            if (settings.version) packageJson.version = settings.version;
-            packageJson.contributes.configuration.title = settings.displayName;
+            extensionManifest.description = generateSettings.description || "Change Me";
+            extensionManifest.displayName = generateSettings.displayName;
+            extensionManifest.name = generateSettings.name;
+            extensionManifest.publisher = generateSettings.publisher;
+            extensionManifest.version = generateSettings.version || "0.0.1";
 
-            const packageJsonSaved = await this.fileSystem.writeFile(packageJsonPath, packageJson, true);
+            extensionManifest.contributes.configuration.title = generateSettings.displayName;
+
+            const packageJsonSaved = await this.fileSystem.writeFile(extensionManifestPath, extensionManifest, true);
             if (!packageJsonSaved) {
-                this.output.modalError("Failed to write package.json", packageJsonManuallyEditMessage);
+                result = "partial";
+                this.output.modalError("Failed to write extension manifest", packageJsonManuallyEditMessage);
                 // NOTE: continue on error
             }
         }
 
-        const filesToReplaceIn = [
-            packageJsonPath,
-            this.fileSystem.joinPath(settings.directory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"),
-            this.fileSystem.joinPath(settings.directory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts")
+        let filesToReplaceIn = [
+            extensionManifestPath,
+            this.fileSystem.joinPath(generateSettings.projectDirectory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"),
+            this.fileSystem.joinPath(generateSettings.projectDirectory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts")
         ];
 
         for (const fileToReplaceIn of filesToReplaceIn) {
-            const didReplaceInFile = await this.fileSystem.replaceInFile(fileToReplaceIn, { find: /change-me/g, replace: settings.id });
+            const didReplaceInFile = await this.fileSystem.replaceInFile(fileToReplaceIn,
+                { find: /\{\{displayName\}\}/g, replace: generateSettings.displayName },
+                { find: /\{\{name\}\}/g, replace: generateSettings.name },
+                { find: /\{\{publisher\}\}/g, replace: generateSettings.publisher });
+
             if (!didReplaceInFile) {
-                this.output.modalError("Failed to replace in file", `Failed to replace 'change-me' with package ID in: ${fileToReplaceIn}`);
+                result = "partial";
+                this.output.modalWarning("Failed to replace", `Failed to replace placeholders in: ${fileToReplaceIn}`);
                 // NOTE: continue on error
             }
         }
 
-        return true;
+        if (generateSettings.className) {
+            if (!generateSettings.className.endsWith("VSCodeExtension")) {
+                generateSettings.className += "VSCodeExtension";
+            }
+
+            filesToReplaceIn = [
+                this.fileSystem.joinPath(generateSettings.projectDirectory, "src/extension.ts"),
+                this.fileSystem.joinPath(generateSettings.projectDirectory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"),
+                this.fileSystem.joinPath(generateSettings.projectDirectory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts")
+            ];
+
+            for (const fileToReplaceIn of filesToReplaceIn) {
+                const didReplaceInFile = await this.fileSystem.replaceInFile(fileToReplaceIn, { find: /ExtensionTemplateVSCodeExtension/g, replace: generateSettings.className });
+
+                if (!didReplaceInFile) {
+                    result = "partial";
+                    this.output.modalWarning("Failed to set class name", `Failed to set class name in: ${fileToReplaceIn}`);
+                    // NOTE: continue on error
+                }
+            }
+
+            const filesToMove = [
+                this.fileSystem.joinPath(generateSettings.projectDirectory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"),
+                this.fileSystem.joinPath(generateSettings.projectDirectory, "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts")
+            ];
+
+            for await (const fileToMove of filesToMove) {
+                const newFilePath = fileToMove.replace(/ExtensionTemplateVSCodeExtension/, generateSettings.className);
+                const didRenameFile = await this.fileSystem.move(fileToMove, newFilePath);
+
+                if (!didRenameFile) {
+                    result = "partial";
+                    this.output.modalWarning("Failed to rename", `Failed to rename file: ${fileToMove} -> ${newFilePath}`);
+                    // NOTE: continue on error
+                }
+            }
+        }
+
+        return result;
     }
 
+    /** Installs NPM package dependencies at the specified directory. */
     public async installNpmDependenciesUsingNpmx(directory: string, output: VSCodeExtensionUI): Promise<boolean> {
-        output.channelOutputLine(`Installing NPM dependencies using 'npmx.sh' in '${directory}'...`, true);
-        const execResult = await this.executor.exec("./npmx.sh -y install", directory, ExecutorExecOutput.outputChannel, output);
-        return execResult.code === 0;
+        output.showChannel();
+        const execResult = await this.executor.exec("npm install", directory, ExecutorExecOutput.outputChannel, output);
+        return execResult.success;
     }
-}
-
-export interface ExtensionProjectSettings {
-    description?: string;
-    directory?: string;
-    displayName?: string;
-    id?: string;
-    installDependencies?: boolean;
-    name?: string;
-    openInVSCode?: boolean;
-    publisher?: string;
-    version?: string;
 }

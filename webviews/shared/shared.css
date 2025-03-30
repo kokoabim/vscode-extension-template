@@ -1,0 +1,122 @@
+header {
+    background-image: url(../shared/images/extension-256.png);
+    background-size: 72px;
+    background-position: left bottom;
+    background-repeat: no-repeat;
+    padding-left: 84px;
+}
+
+h1 {
+    font-size: 2em;
+    margin: 0;
+    padding: 1em 0 0 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0;
+    padding: 1em 0 0 0;
+}
+
+h3 {
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.5em 0 0 0;
+}
+
+vscode-form-group, .button-group {
+    margin: 1.5em 0;
+}
+
+vscode-checkbox-group {
+    margin: 0 0 1.5em 0;
+}
+
+vscode-checkbox {
+    margin-bottom: 0.5em;
+}
+
+p.textfield-note {
+    margin: 0 0 1em 0;
+    padding: 0.5em 0 0 0;
+    font-size: 0.9em;
+}
+
+div.textfield,
+div.textfield-with-icon {
+    display: flex;
+    align-items: center;
+}
+
+div.textfield-with-icon span.clickable {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 0.5em;
+}
+
+div.textfield-with-icon span.clickable i {
+    margin-right: 0.25em;
+}
+
+code {
+    font-family: var(--vscode-editor-font-family, monospace);
+}
+
+vscode-label {
+    margin-top: 1em;
+}
+
+vscode-textfield {
+    width: 512px;
+}
+
+vscode-button {
+    margin-right: 1em;
+}
+
+.actionable {
+    color: var(--vscode-textLink-foreground);
+    cursor: pointer;
+    text-decoration: var(--text-link-decoration);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li.suggestion {
+    padding: 0.15em 0;
+}
+
+li.suggestion-ok::before {
+    content: "✅";
+    margin-right: 0.5em;
+}
+
+li.suggestion-error::before {
+    content: "❌";
+    margin-right: 0.5em;
+}
+
+li.suggestion-warn::before {
+    content: "⚠️";
+    margin-right: 0.5em;
+}
+
+span.suggestion-message {
+    color: var(--vscode-gitDecoration-ignoredResourceForeground);
+}
+
+a {
+    color: var(--vscode-textLink-foreground);
+    text-decoration: var(--text-link-decoration);
+}
+
+.normal-text {
+    font-size: 1em;
+    font-weight: normal;
+}

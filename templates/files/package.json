@@ -1,16 +1,16 @@
 {
-    "name": "change-me",
-    "publisher": "change-me",
-    "version": "0.0.1",
-    "description": "Change Me",
-    "displayName": "Change Me",
+    "name": "{{name}}",
+    "publisher": "{{publisher}}",
+    "version": "{{version}}",
+    "description": "{{description}}",
+    "displayName": "{{displayName}}",
     "shortName": "",
     "homepage": "",
     "bugs": {
         "url": ""
     },
     "repository": {
-        "type": "",
+        "type": "git",
         "url": ""
     },
     "license": "SEE LICENSE IN LICENSE.md",
@@ -24,9 +24,9 @@
     "main": "./dist/extension.js",
     "contributes": {
         "configuration": {
-            "title": "Change Me",
+            "title": "{{displayName}}",
             "properties": {
-                "change-me.yourName": {
+                "{{name}}.yourName": {
                     "type": "string",
                     "default": "World",
                     "markdownDescription": "What is _your_ name?"
@@ -35,19 +35,19 @@
         },
         "commands": [
             {
-                "command": "change-me.hello-world",
+                "command": "{{name}}.hello-world",
                 "title": "Hello World"
             }
         ]
     },
     "scripts": {
-        "compile": "tsc -p ./",
+        "compile": "./npmx.sh -cy compile",
         "install-compile": "./npmx.sh -bcy install",
         "lint": "eslint ./src",
         "pretest": "./npmx.sh -cly install",
         "test": "vscode-test",
         "vscode:prepublish": "./npmx.sh -y prepublish",
-        "watch": "tsc -watch -p ./"
+        "watch": "tsc -watch -p ./tsconfig.json"
     },
     "devDependencies": {
         "@types/node": "^22.x",
@@ -59,7 +59,6 @@
         "typescript": "^5.8.2"
     },
     "dependencies": {
-        "@types/vscode": "^1.96.0",
-        "extract-zip": "^2.0.1"
+        "@types/vscode": "^1.96.0"
     }
 }

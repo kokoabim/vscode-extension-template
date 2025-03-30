@@ -1,12 +1,15 @@
 <h1 align="center">
     <p><img src="https://github.com/kokoabim/vscode-extension-template/blob/main/icon/extension-512.png?raw=true" alt="logo" width="240"></p>
     <p>Visual Studio Code Extension Creator</p>
+    <h3 align="center">Create and package your own Visual Studio Code extensions that can be published to the Visual Studio Marketplace for others to install and use</h3></p>
 </h1>
-<h3 align="center">Create and publish your own Visual Studio Code extensions</h3>
-</p>
+
 <p align="center"><a href="https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator"><img src="https://vsmarketplacebadges.dev/version/spencerjames.extension-creator.svg?label=VSCode%20Extension%20Creator"></a></p>
 
-<p align="center"><img src="https://github.com/kokoabim/vscode-extension-template/blob/main/images/settings-form.png?raw=true" alt="logo" width="600"></p>
+<p align="center">
+    <img src="https://github.com/kokoabim/vscode-extension-template/blob/main/images/create-project.png?raw=true" alt="logo" width="400"/>
+    <img src="https://github.com/kokoabim/vscode-extension-template/blob/main/images/build-package.png?raw=true" alt="logo" width="400"/>
+</p>
 
 # 📦 Requirements
 
@@ -17,42 +20,25 @@
 
 # 🎬 Getting Started
 
-There are a few options to get started.
+Install this extension: https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator
 
-### Option 1 (Preferred): Use VSCode Command
+### Create Extension Project
 
-This is option is the easiest, most convenient and will always use the latest template.
-
-1. Install this extension: https://marketplace.visualstudio.com/items?itemName=spencerjames.extension-creator
-2. Use its `Create Visual Studio Code Extension...` command or [Create VS Code Extension] button on Explorer Side Bar (visible when no folder is open).
-3. Enter the extension project settings in the form and click `Create`.
-4. Open new extension directory in Visual Studio Code.
-5. Modify the `./package.json` file with appropriate values: description, author, etc.
-    - See https://code.visualstudio.com/api/references/extension-manifest for more information.
-6. Address all TODOs in source files (Find in Files: `TODO`) as appropriate.
-
-### Option 2: Use Git Repository
-
-If you're not in VSCode with this extension installed, you can clone this extension's git repository.
-
-1. Clone repository: `git@github.com:kokoabim/vscode-extension-template.git`
-2. In its directory, run `./vscx-template.sh project <name> <publisher> <path>` (included in the repository) to create a new extension project using the latest template.
-3. Install NPM dependencies by running `./npmx.sh install` (included in this repository) or `npm install`.
-4. Open new extension directory in Visual Studio Code.
-5. Modify the `./package.json` file with appropriate values: name, publisher, displayName, description, author, etc.
-    - See https://code.visualstudio.com/api/references/extension-manifest for more information.
-6. Address all TODOs in source files (Find in Files: `TODO`) as appropriate.
-
-### Option 3: Download Latest Template
-
-1. Download the latest template: https://github.com/kokoabim/vscode-extension-template/raw/refs/heads/main/templates/vscx-template-latest.zip
-2. Unzip the file into a new extension project directory.
-3. Modify the `./package.json` file with appropriate values: name, publisher, displayName, description, author, etc.
-    - Replace `change-me` instances with your extension's name.
-    - Replace `Change Me` with appropriate values.
-    - See https://code.visualstudio.com/api/references/extension-manifest for more information.
-4. Modify source files (Find in Files: `change-me`) with your extension's name.
+1. Use the `Create Visual Studio Code Extension...` command or [Create VS Code Extension] button on Explorer Side Bar (visible when no folder is open).
+2. Complete the form and click [Create Project].
+3. Open new extension directory in Visual Studio Code.
+4. Modify the `./package.json` file with appropriate values.
+    - See https://code.visualstudio.com/api/references/extension-manifest and https://docs.npmjs.com/cli/v11/configuring-npm/package-json for more information.
 5. Address all TODOs in source files (Find in Files: `TODO`) as appropriate.
+
+### Package Extension
+
+1. Use the `Package Visual Studio Code Extension...` command.
+2. Complete the form and click [Package Extension].
+3. The `.vsix` file will be created in the `./releases/` directory (by default).
+4. Upload the `.vsix` file to the Visual Studio Marketplace: https://marketplace.visualstudio.com/manage
+
+See more information about publishing below.
 
 # 📂 Project Structure
 
@@ -60,7 +46,7 @@ If you're not in VSCode with this extension installed, you can clone this extens
 | ----------------------- | ------------------------------------------------------- |
 | `.vscode/`              | VS Code settings and configurations                     |
 | `dist/`                 | Compiled TypeScript files                               |
-| `node_modules/`         | NPM dependencies                                        |
+| `node_modules/`         | NPM package dependencies                                |
 | `releases/`             | `.vsix` files for release                               |
 | `src/`                  | Source files                                            |
 | `src/test/`             | Test files                                              |
@@ -70,8 +56,9 @@ If you're not in VSCode with this extension installed, you can clone this extens
 | `eslint.config.mjs`     | ESLint configuration                                    |
 | `LICENSE.md`            | License file                                            |
 | `npmx.sh`               | Command-line tool for NPM tasks                         |
-| `package.json`          | Extension manifest and NPM dependencies                 |
-| `README.md`             | This file                                               |
+| `package.json`          | Extension manifest and NPM package dependencies         |
+| `README.md`             | Extension page on the Visual Studio Marketplace         |
+| `SUPPORT.md`            | Extension support file                                  |
 | `tsconfig.json`         | TypeScript configuration                                |
 | `tsconfig.publish.json` | TypeScript configuration used for publishing            |
 | `vscx.sh`               | Command-line tool for creating `.vsix` files            |
@@ -136,9 +123,15 @@ _Brand_ your extension.
 
 # 🚀 Publishing
 
-### Create `.vsix` file
+There are two ways to package your extension for the Visual Studio Marketplace.
 
-Use `./vscx.sh` (included in this repository; not to be confused with `vsce`) to create a `.vsix` file for release. Unless the `-d:` option is used, it will output a `.vsix` file in a `./releases/` directory that can be uploaded to the Visual Studio Marketplace.
+### Using VS Code Command
+
+Use the `Package Visual Studio Code Extension...` command to create a `.vsix` file for distribution. This will create a `.vsix` file in the `./releases/` directory (by default) that can be uploaded to the Visual Studio Marketplace.
+
+### Using Command-Line Tool
+
+You can use `./vscx.sh` (included in this repository; not to be confused with `vsce`) to create a `.vsix` file for distribution. Unless the `-d:` option is used, it will output a `.vsix` file in a `./releases/` directory that can be uploaded to the Visual Studio Marketplace.
 
 `./vscx.sh` uses `./npmx.sh` to install dependencies and compile the extension for release. `./npmx.sh` will omit dev dependencies and use a publish TypeScript configuration to compile the extension.
 
@@ -157,7 +150,7 @@ A command you'll probably end up using a lot is `./vscx.sh -oxy pi` which will:
 3. Uninstalling extension (if installed).
 4. Install the extension using the new `.vsix` file.
 
-Note: If you install a `.vsix` file locally, you'll want to uninstall it after testing to later install the new version from the Visual Studio Code Extensions Side Bar once published to the Visual Studio Marketplace.
+Note: If you install a `.vsix` file locally for testing, you'll want to uninstall it after to later install the new version from the Visual Studio Code Extensions Side Bar once published to the Visual Studio Marketplace.
 
 ### Publishing `.vsix` file to the Visual Studio Marketplace
 

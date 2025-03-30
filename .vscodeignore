@@ -6,8 +6,13 @@
 .gitignore
 .vscode-test.mjs
 
+**/tsconfig.json
+**/webpack.config.js
+
+**/webviews/**/package.json
+**/webviews/**/*.ts
+
 eslint.config.mjs
-tsconfig.json
 tsconfig.publish.json
 
 .vscode-test/

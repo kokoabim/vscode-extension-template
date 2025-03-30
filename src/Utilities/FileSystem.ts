@@ -38,6 +38,13 @@ export class FileSystem {
 
     public joinPath(...path: string[]): string { return Path.join(...path); }
 
+    public async move(sourcePath: string, destinationPath: string): Promise<boolean> {
+        const sourceType = await this.getEntryType(sourcePath);
+        if (sourceType === FsEntryType.none) return false;
+
+        return await fs.rename(sourcePath, destinationPath).then(() => true).catch(() => false);
+    }
+
     public async readJsonFile<T>(...path: string[]): Promise<T | undefined> {
         return await fs.readFile(Path.join(...path)).then(data => {
             try { return JSON.parse(data.toString("utf8")) as T; }

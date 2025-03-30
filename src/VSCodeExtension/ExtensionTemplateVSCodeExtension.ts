@@ -5,14 +5,16 @@ import { ExtensionTemplateVSCodeExtensionSettings } from "./ExtensionTemplateVSC
 
 // TEMPLATE-REMOVE-START
 import { homedir } from "os";
-import { ExtensionProjectSettings, VSCodeExtensionProjectGenerator } from "../Utilities/VSCodeExtensionProjectGenerator";
+import { ExtensionProjectGenerateSettings, VSCodeExtensionProjectGenerator } from "../Utilities/VSCodeExtensionProjectGenerator";
 import { FileSystem } from "../Utilities/FileSystem";
 import { VSCodeApi } from "./VSCodeApi";
+import { VariableExpander } from "../Utilities/VariableExpander";
+import { ExtensionPackageGenerateSettings, VSCodeExtensionPackageGenerator } from "../Utilities/VSCodeExtensionPackageGenerator";
 // TEMPLATE-REMOVE-END
 
-// TODO: rename 'ExtensionTemplateVSCodeExtension' class to reflect the name of your extension and this file
 export class ExtensionTemplateVSCodeExtension extends VSCodeExtension {
     // TEMPLATE-REMOVE-START
+    private readonly extensionPackageGenerator: VSCodeExtensionPackageGenerator;
     private readonly extensionProjectGenerator: VSCodeExtensionProjectGenerator;
     private readonly fileSystem = new FileSystem();
     // TEMPLATE-REMOVE-END
@@ -21,9 +23,10 @@ export class ExtensionTemplateVSCodeExtension extends VSCodeExtension {
         // TEMPLATE-REMOVE-START
         super(context, true);
 
+        this.extensionPackageGenerator = new VSCodeExtensionPackageGenerator(this);
         this.extensionProjectGenerator = new VSCodeExtensionProjectGenerator(this, this.fileSystem.joinPath(this.context.extensionPath, "templates"));
 
-        this.addCommands(this.createOpenNewExtensionProjectPanelCommand());
+        this.addCommands(this.createCreateExtensionCommand(), this.createPackageExtensionCommand());
         // TEMPLATE-REMOVE-END
 
         /** TEMPLATE-ADD-START
@@ -33,162 +36,303 @@ export class ExtensionTemplateVSCodeExtension extends VSCodeExtension {
         TEMPLATE-ADD-END */
     }
 
+    /**
+     * Main entry point for the extension. Call from 'activate' function in './src/extension.ts'
+     */
     public static use(context: vscode.ExtensionContext): ExtensionTemplateVSCodeExtension {
         return new ExtensionTemplateVSCodeExtension(context);
     }
 
+    /** TEMPLATE-ADD-START
     private createSayHelloWorldCommand(): VSCodeCommand {
-        return new VSCodeCommand("extension-creator.hello-world", async () => {
+        return new VSCodeCommand("{{name}}.hello-world", async () => {
             const settings = ExtensionTemplateVSCodeExtensionSettings.singleton(true);
             await this.information(`Hello, ${settings.yourName}!`);
         });
     }
+    TEMPLATE-ADD-END */
 
     // TEMPLATE-REMOVE-START
-    private createCreateNewExtensionProjectCommand(): VSCodeCommand {
-        return new VSCodeCommand("extension-creator.create-new-extension-project", async () => {
-            const projectSettings = await this.promptForExtensionProjectSettings();
-            if (!projectSettings) return;
-
-            await this.createAndOpenNewExtensionProject(projectSettings);
+    private createCreateExtensionCommand(): VSCodeCommand {
+        return new VSCodeCommand("extension-creator.create-extension", async () => {
+            await this.openCreateExtensionWebview();
         });
     }
 
-    private createOpenNewExtensionProjectPanelCommand(): VSCodeCommand {
-        return new VSCodeCommand("extension-creator.open-new-extension-project-panel", async () => {
-
-            const webviewsPath = vscode.Uri.joinPath(this.context.extensionUri, "webviews");
-            const webviewPath = vscode.Uri.joinPath(webviewsPath, "new-vscode-extension-project");
-
-            const panel = vscode.window.createWebviewPanel(
-                "extension-creator.new-vscode-extension-project",
-                "VSCode Extension Creator",
-                vscode.window.activeTextEditor?.viewColumn ?? vscode.ViewColumn.One,
-                {
-                    enableCommandUris: true,
-                    enableScripts: true,
-                    localResourceRoots: [
-                        webviewsPath,
-                        vscode.Uri.joinPath(this.context.extensionUri, "node_modules"),
-                    ],
-                    enableForms: true,
-                }
-            );
-            panel.iconPath = vscode.Uri.joinPath(webviewPath, "images", "extension-64.png");
-            panel.onDidChangeViewState((e) => {
-                if (!e.webviewPanel.visible) {
-                    panel.dispose();
-                }
-            });
-
-            const bodyHtml = (await this.fileSystem.readFileAsString(webviewPath.fsPath, "body.html") ?? "").replace("{{defaultValue}}", `${homedir()}/Projects`);
-            const nonce = getNonce();
-
-            const scriptUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(webviewPath, "main.js"));
-            const styleMainUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(webviewPath, "main.css"));
-            const codiconsUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'));
-            const bundleUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(webviewPath, "bundle.js"));
-
-            panel.webview.html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${panel.webview.cspSource}; script-src 'nonce-${nonce}'; font-src ${panel.webview.cspSource}; img-src ${panel.webview.cspSource};">
-<link href="${styleMainUri}" rel="stylesheet" />
-<link href="${codiconsUri}" rel="stylesheet" />
-</head>
-<body>
-${bodyHtml}
-<script src="${bundleUri}" nonce="${nonce}"></script>
-<script src="${scriptUri}" nonce="${nonce}"></script>
-</body>
-</html>`;
-
-            panel.webview.onDidReceiveMessage(async (message) => {
-                console.log("Received message from webview:", message);
-
-                if (message.type === "create-extension-project") {
-                    const projectSettings: ExtensionProjectSettings = {
-                        description: message.settings?.ext_description,
-                        directory: message.settings?.proj_directory,
-                        displayName: message.settings?.ext_displayName,
-                        installDependencies: message.settings?.install_dependencies,
-                        name: message.settings?.ext_name,
-                        openInVSCode: message.settings?.open_in_vscode,
-                        publisher: message.settings?.ext_publisher,
-                        version: message.settings?.ext_version,
-                    };
-
-                    panel.dispose();
-
-                    await this.createAndOpenNewExtensionProject(projectSettings);
-                }
-                else if (message.type === "cancel") {
-                    panel.dispose();
-                }
-                else if (message.type === "select-project-location") {
-                    const directoryUri = await vscode.window.showOpenDialog({
-                        title: "Select project location",
-                        canSelectFiles: false, canSelectFolders: true, canSelectMany: false,
-                        openLabel: "Select",
-                        defaultUri: message.directory ? vscode.Uri.file(message.directory) : vscode.Uri.file(homedir() + "/Projects"),
-                    });
-                    if (directoryUri) {
-                        panel.webview.postMessage({ type: "project-location-selected", directory: directoryUri[0].fsPath });
-                    }
-                }
-            });
-
-            panel.reveal();
+    private createPackageExtensionCommand(): VSCodeCommand {
+        return new VSCodeCommand("extension-creator.package-extension", async () => {
+            await this.openPackageExtensionWebview();
         });
     }
 
-    private async createAndOpenNewExtensionProject(projectSettings: ExtensionProjectSettings): Promise<void> {
-        const didCreateProject = await this.extensionProjectGenerator.createNewExtensionProject(projectSettings);
+    private async createExtensionProject(extensionProjectSettings: ExtensionProjectGenerateSettings): Promise<void> {
+        const didCreateProject = await this.extensionProjectGenerator.generateExtensionProject(extensionProjectSettings);
+        if (didCreateProject === false) return;
 
-        if (!didCreateProject || (projectSettings.installDependencies === false && projectSettings.openInVSCode === false)) return;
+        if (extensionProjectSettings.installNpmDependencies === false && extensionProjectSettings.openInVSCode === false) {
+            if (didCreateProject === true) await this.information("Extension project created");
+            else await this.warning("Extension project created but with issues");
+            return;
+        }
 
-        if (projectSettings.installDependencies) {
-            if (!await this.extensionProjectGenerator.installNpmDependenciesUsingNpmx(projectSettings.directory!, this)) {
-                await this.modalError("Failed NPM dependencies", "Failed to install NPM dependencies. You will need to run './npmx.sh install' manually.");
+        if (extensionProjectSettings.installNpmDependencies) {
+            if (!await this.extensionProjectGenerator.installNpmDependenciesUsingNpmx(extensionProjectSettings.projectDirectory!, this)) {
+                await this.modalError("Failed NPM package dependencies", "You will need to run './npmx.sh install' manually.");
             }
         }
 
-        if (projectSettings.openInVSCode) {
+        if (extensionProjectSettings.openInVSCode) {
             const openFolderSettings: VSCodeApi.IOpenFolderAPICommandOptions = {};
 
             if (await this.isWorkspaceOpen(false)) openFolderSettings.forceNewWindow = true;
             else openFolderSettings.forceReuseWindow = true;
 
-            await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(projectSettings.directory!), openFolderSettings);
+            await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(extensionProjectSettings.projectDirectory!), openFolderSettings);
         }
+
+        if (didCreateProject === true) await this.information("Extension project created");
+        else await this.warning("Extension project created but with issues");
     }
 
-    private async promptForExtensionProjectSettings(): Promise<ExtensionProjectSettings | undefined> {
-        const settings: ExtensionProjectSettings = {};
-
-        const title = "Create new VSCode extension project";
-
-        settings.displayName = await vscode.window.showInputBox({ title: title, prompt: "Display name. Ex: 'The Foo Bar'" });
-        if (!settings.displayName) return;
-
-        settings.publisher = await vscode.window.showInputBox({ title: title, prompt: "Publisher name. Ex: 'joe-or-jill-dev'" });
-        if (!settings.publisher) return;
-
-        settings.description = await vscode.window.showInputBox({ title: title, prompt: "Description. Ex: 'Do all sorts of foo's and bar's.'" });
-        if (settings.description === undefined) return;
-
-        const directoryUri = await vscode.window.showOpenDialog({
-            title: title,
-            canSelectFiles: false, canSelectFolders: true, canSelectMany: false,
-            openLabel: "Select Parent",
+    private async openCreateExtensionWebview(): Promise<void> {
+        const settings = ExtensionTemplateVSCodeExtensionSettings.transientConfigured(settings => {
+            settings.projectParentDirectory = VariableExpander.expandString(settings.projectParentDirectory);
         });
-        if (!directoryUri) return;
-        settings.directory = directoryUri[0].fsPath;
 
-        return settings;
+        const webviewsBasePathUri = vscode.Uri.joinPath(this.context.extensionUri, "webviews");
+        const webviewsSharedPathUri = vscode.Uri.joinPath(webviewsBasePathUri, "shared");
+        const nodeModulesPathUri = vscode.Uri.joinPath(this.context.extensionUri, "node_modules");
+
+        const createExtensionWebviewPathUri = vscode.Uri.joinPath(webviewsBasePathUri, "webview-create-extension");
+
+        const webviewPanel = vscode.window.createWebviewPanel(
+            "extension-creator.create-extension",
+            "VS Code Extension Creator",
+            vscode.window.activeTextEditor?.viewColumn ?? vscode.ViewColumn.One,
+            {
+                enableCommandUris: true,
+                enableScripts: true,
+                localResourceRoots: [
+                    webviewsBasePathUri,
+                    nodeModulesPathUri,
+                ],
+                enableForms: true,
+            }
+        );
+        webviewPanel.iconPath = vscode.Uri.joinPath(webviewsSharedPathUri, "images", "extension-64.png");
+
+        const bodyHtml = await this.fileSystem.readFileAsString(createExtensionWebviewPathUri.fsPath, "body.html");
+        const nonce = getNonce();
+
+        const bundleJsWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(createExtensionWebviewPathUri, "bundle.js"));
+        const codiconsStyleWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(nodeModulesPathUri, "@vscode/codicons", "dist", "codicon.css"));
+        const mainScriptWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(createExtensionWebviewPathUri, "main.js"));
+        const mainStyleWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(webviewsSharedPathUri, "shared.css"));
+
+        webviewPanel.webview.html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webviewPanel.webview.cspSource}; script-src 'nonce-${nonce}'; font-src ${webviewPanel.webview.cspSource}; img-src ${webviewPanel.webview.cspSource};">
+<link href="${codiconsStyleWebviewUri}" rel="stylesheet" />
+<link href="${mainStyleWebviewUri}" rel="stylesheet" />
+</head>
+<body>
+${bodyHtml}
+<script nonce="${nonce}">
+const settings = {
+extension: ${JSON.stringify(settings)}
+};
+</script>
+<script src="${bundleJsWebviewUri}" nonce="${nonce}"></script>
+<script src="${mainScriptWebviewUri}" nonce="${nonce}"></script>
+</body>
+</html>`;
+
+        webviewPanel.webview.onDidReceiveMessage(async (message) => {
+            console.log("Received message from webview-panel:", message);
+
+            if (message.type === "create-extension-project") {
+                if (!message.settings) return;
+
+                const generateSettings: ExtensionProjectGenerateSettings = {
+                    className: message.settings.extension_className,
+                    description: message.settings.extension_description,
+                    displayName: message.settings.extension_displayName,
+                    installNpmDependencies: message.settings.install_npm_dependencies ? true : false,
+                    name: message.settings.extension_name,
+                    openInVSCode: message.settings.open_in_vscode ? true : false,
+                    overwriteProjectDestinationPath: message.settings.overwrite_destination_path ? true : false,
+                    parentDirectory: message.settings.parent_directory,
+                    publisher: message.settings.extension_publisher,
+                    version: message.settings.extension_version,
+                };
+
+                await this.createExtensionProject(generateSettings);
+            }
+            else if (message.type === "cancel") {
+                webviewPanel.dispose();
+            }
+            else if (message.type === "open-extension-creator-settings") {
+                await vscode.commands.executeCommand("workbench.action.openSettings", "@ext:spencerjames.extension-creator");
+            }
+            else if (message.type === "select-project-location") {
+                const directoryUri = await vscode.window.showOpenDialog({
+                    title: "Select project location",
+                    canSelectFiles: false, canSelectFolders: true, canSelectMany: false,
+                    openLabel: "Select",
+                    defaultUri: message.directory ? vscode.Uri.file(message.directory) : vscode.Uri.file(homedir() + "/Projects"),
+                });
+                if (directoryUri) {
+                    await webviewPanel.webview.postMessage({ type: "project-location-selected", directory: directoryUri[0].fsPath });
+                }
+            }
+        });
+
+        webviewPanel.reveal();
+    }
+
+    private async openPackageExtensionWebview(): Promise<void> {
+        if (!await this.isWorkspaceOpen()) return;
+
+        let packageJson = await this.readPackageJson();
+        if (!packageJson) return;
+
+        const settings = ExtensionTemplateVSCodeExtensionSettings.transientConfigured(settings => {
+            settings.packageOutputDirectory = VariableExpander.expandString(settings.packageOutputDirectory);
+        });
+
+        const webviewsBasePathUri = vscode.Uri.joinPath(this.context.extensionUri, "webviews");
+        const webviewsSharedPathUri = vscode.Uri.joinPath(webviewsBasePathUri, "shared");
+        const nodeModulesPathUri = vscode.Uri.joinPath(this.context.extensionUri, "node_modules");
+
+        const packageExtensionWebviewPathUri = vscode.Uri.joinPath(webviewsBasePathUri, "webview-package-extension");
+
+        const webviewPanel = vscode.window.createWebviewPanel(
+            "extension-creator.package-extension",
+            "VS Code Extension Creator",
+            vscode.window.activeTextEditor?.viewColumn ?? vscode.ViewColumn.One,
+            {
+                enableCommandUris: true,
+                enableScripts: true,
+                localResourceRoots: [
+                    webviewsBasePathUri,
+                    nodeModulesPathUri,
+                ],
+                enableForms: true,
+            }
+        );
+        webviewPanel.iconPath = vscode.Uri.joinPath(webviewsSharedPathUri, "images", "extension-64.png");
+
+        const bodyHtml = await this.fileSystem.readFileAsString(packageExtensionWebviewPathUri.fsPath, "body.html");
+        const nonce = getNonce();
+
+        const bundleJsWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(packageExtensionWebviewPathUri, "bundle.js"));
+        const codiconsStyleWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(nodeModulesPathUri, "@vscode/codicons", "dist", "codicon.css"));
+        const mainScriptWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(packageExtensionWebviewPathUri, "main.js"));
+        const mainStyleWebviewUri = webviewPanel.webview.asWebviewUri(vscode.Uri.joinPath(webviewsSharedPathUri, "shared.css"));
+
+        webviewPanel.webview.html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webviewPanel.webview.cspSource}; script-src 'nonce-${nonce}'; font-src ${webviewPanel.webview.cspSource}; img-src ${webviewPanel.webview.cspSource};">
+<link href="${codiconsStyleWebviewUri}" rel="stylesheet" />
+<link href="${mainStyleWebviewUri}" rel="stylesheet" />
+</head>
+<body>
+${bodyHtml}
+<script nonce="${nonce}">
+const settings = {
+    extension: ${JSON.stringify(settings)},
+    package: ${JSON.stringify(packageJson)}
+};
+</script>
+<script src="${bundleJsWebviewUri}" nonce="${nonce}"></script>
+<script src="${mainScriptWebviewUri}" nonce="${nonce}"></script>
+</body>
+</html>`;
+
+        const packageJsonWatcher = vscode.workspace.createFileSystemWatcher(`${this.workspaceFolder!.uri.fsPath}/package.json`, true, false, true).onDidChange(async () => {
+            packageJson = await this.readPackageJson();
+            if (!packageJson) return;
+            await webviewPanel.webview.postMessage({ type: "package-json-changed", package: packageJson });
+        });
+
+        webviewPanel.onDidDispose(() => {
+            packageJsonWatcher.dispose();
+        });
+
+        webviewPanel.webview.onDidReceiveMessage(async (message) => {
+            if (message.type === "build-extension-package") {
+                if (!message.settings) return;
+
+                const generateSettings: ExtensionPackageGenerateSettings = {
+                    installExtension: message.settings.install_extension ? true : false,
+                    outputDirectory: message.settings.output_directory,
+                    overwritePackageDestinationPath: message.settings.overwrite_destination_path ? true : false,
+                    packageFileName: message.settings.package_file_name,
+                    preReleaseVersion: message.settings.pre_release_version ? true : false,
+                    projectDirectory: this.workspaceFolder!.uri.fsPath,
+                };
+
+                if (await this.extensionPackageGenerator.generateExtensionPackage(generateSettings)) await this.information("Extension package built");
+                else await this.error("Failed to build extension package");
+            }
+            else if (message.type === "cancel") {
+                webviewPanel.dispose();
+            }
+            else if (message.type === "open-extension-creator-settings") {
+                await vscode.commands.executeCommand("workbench.action.openSettings", "@ext:spencerjames.extension-creator");
+            }
+            else if (message.type === "select-output-location") {
+                const directoryUri = await vscode.window.showOpenDialog({
+                    title: "Select output location",
+                    canSelectFiles: false, canSelectFolders: true, canSelectMany: false,
+                    openLabel: "Select",
+                    defaultUri: message.directory ? vscode.Uri.file(message.directory) : vscode.Uri.file(homedir() + "/Projects"),
+                });
+                if (directoryUri) {
+                    await webviewPanel.webview.postMessage({ type: "project-location-selected", directory: directoryUri[0].fsPath });
+                }
+            }
+            else if (message.type === "open-text-document") {
+                if (!await this.isWorkspaceOpen()) return;
+
+                const textDocument = await vscode.workspace.openTextDocument(vscode.Uri.joinPath(this.workspaceFolder!.uri, message.path));
+                await vscode.window.showTextDocument(textDocument, {
+                    preview: false,
+                    viewColumn: vscode.ViewColumn.Beside,
+                });
+            }
+            else {
+                console.log("Received unknown message type from webview-panel:", message.type);
+            }
+        });
+
+        webviewPanel.reveal();
+    }
+
+    private async readPackageJson(): Promise<any> {
+        if (!await this.isWorkspaceOpen()) return;
+
+        const packageJsonUri = vscode.Uri.joinPath(this.workspaceFolder!.uri, "package.json");
+        if (!await this.fileSystem.fileExists(packageJsonUri.fsPath)) {
+            await this.information("No 'package.json' file found in the workspace.");
+            return;
+        }
+
+        const packageJson = await this.fileSystem.readJsonFile(packageJsonUri.fsPath);
+        if (!packageJson) {
+            await this.information("Failed to read 'package.json' file.");
+            return;
+        }
+
+        return packageJson;
     }
     // TEMPLATE-REMOVE-END
 }

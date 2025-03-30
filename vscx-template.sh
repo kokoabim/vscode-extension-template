@@ -29,34 +29,36 @@
 set -eo pipefail
 
 script_name="${0##*/}"
-script_ver="1.0.1"
+script_ver="1.0.2"
 script_title="Visual Studio Code Extension Template"
-script_options="f:"
+script_options="f:x:"
 script_switches="chioy"
 
 function usage() {
     end "$script_title (v$script_ver)
 
 Use: $script_name [-fo] create
-     $script_name [-cfio] project $(text_underline name) $(text_underline publisher) $(text_underline path)
+     $script_name [-cfio] [-x:] project $(text_underline publisher) $(text_underline displayName) $(text_underline name) $(text_underline parentDir)
 
 Actions:
- create   Create the VSCode extension template files (latest and versioned) in $templates_directory directory
- project  Create a new VSCode extension project from template file
-           • $(text_underline name)      Extension name
-           • $(text_underline publisher) Extension publisher ID
-           • $(text_underline path)      Directory path to create project directory in
+ create   Create the VS Code extension template files (latest and versioned) in $templates_directory directory
+ project  Create a new VS Code extension project from template file
+           • $(text_underline publisher)   Extension publisher ID
+           • $(text_underline displayName) Extension display name
+           • $(text_underline name)        Extension name
+           • $(text_underline parentDir)   Parent directory where new project directory is created
 
 Options:
- -f $(text_underline path)  Template file to create (create; default: $templates_directory/vscx-template-latest.zip) or use (project)
-           • With create action, a versioned file is not created
-           • With project action, the file at $(text_underline path) is used instead of the latest template file
+ -f $(text_underline path)   Template file to create (create action; default: $template_file_path) or use (project action)
+            • With create action, a versioned file is not created
+            • With project action, the file at $(text_underline path) is used instead of the latest template file
+ -x $(text_underline class)  Extension TypeScript class name (default: class-name-safe $(text_underline displayName))
 
 Switches:
- -c  Open project in VSCode after creating
+ -c  Open project in VS Code after creating
  -h  View this help
- -i  Install dependencies after creating project (npm install)
- -o  Overwrite template versioned file (create), template file (create with -f:) or project directory (project)
+ -i  Install NPM package dependencies after creating project (npm install)
+ -o  Overwrite template versioned file (create action), template file (create action with -f:) or project directory (project action)
  -y  Confirm yes to run
 "
 }
@@ -101,13 +103,14 @@ function confirm_run() {
 
 create_versioned_file=1
 custom_template_file=0
-install_dependencies=0
+install_npm_dependencies=0
 open_after_create=0
 overwrite=0
 pkg_json_file="./package.json"
 
 templates_directory="./templates"
-template_file="$(realpath $templates_directory)/vscx-template-latest.zip"
+template_filename="vscx-template-latest.zip"
+template_file_path="$(realpath $templates_directory)/${template_filename}"
 
 yes=0
 
@@ -115,12 +118,12 @@ while getopts "${script_options}${script_switches}" OPTION; do
     case "$OPTION" in
     c) open_after_create=1 ;;
     f)
-        template_file="$OPTARG"
+        template_file_path="$OPTARG"
         create_versioned_file=0
         custom_template_file=1
         ;;
     h) usage ;;
-    i) install_dependencies=1 ;;
+    i) install_npm_dependencies=1 ;;
     o) overwrite=1 ;;
     y) yes=1 ;;
     *) usage ;;
@@ -134,37 +137,38 @@ script_action=$1
 [[ "$script_action" =~ ^(create|project)$ ]] || end "Invalid action: $script_action" 1
 
 if [[ "$script_action" == "project" ]]; then
-    ext_name=$(echo "$2" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')
-    ext_display_name="$2"
-    ext_publisher=$(echo "$3" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')
-    ext_path="$4"
+    extension_publisher=$(echo "$2" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')
+    extension_display_name="$3"
+    extension_name=$(echo "$4" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')
+    project_parent_directory="$5"
 
-    [[ "$ext_name" != "" ]] || end "Extension name is required" 1
-    [[ "$ext_publisher" != "" ]] || end "Extension publisher is required" 1
-    [[ "$ext_path" != "" ]] || end "Project path is required" 1
+    [[ "$extension_publisher" != "" ]] || end "Extension publisher is required" 1
+    [[ "$extension_display_name" != "" ]] || end "Extension display name is required" 1
+    [[ "$extension_name" != "" ]] || end "Extension name is required" 1
+    [[ "$project_parent_directory" != "" ]] || end "Parent directory is required" 1
 
-    [[ ! "$ext_name" =~ ^[a-z0-9-\._~]+$ ]] || end "Invalid extension name: $ext_name" 1
-    [[ ! "$ext_publisher" =~ ^[a-z0-9-\._~]+$ ]] || end "Invalid extension publisher: $ext_publisher" 1
-    [[ -d "$ext_path" ]] || end "Directory does not exists: $ext_path" 1
+    [[ ! "$extension_name" =~ ^[a-z0-9-\._]+$ ]] || end "Invalid extension name: $extension_name" 1
+    [[ ! "$extension_publisher" =~ ^[a-z0-9-\._]+$ ]] || end "Invalid extension publisher: $extension_publisher" 1
+    [[ -d "$project_parent_directory" ]] || end "Directory does not exists: $project_parent_directory" 1
 
-    ext_id="$ext_publisher.$ext_name"
+    [[ -f "$template_file_path" ]] || end "Template file not found: $template_file_path" 1
 
-    [[ -f "$template_file" ]] || end "Template file not found: $template_file" 1
+    project_parent_directory=$(realpath "$project_parent_directory")
+    extension_project_directory="$project_parent_directory/vscode-$extension_name"
+    [[ -d "$extension_project_directory" && $overwrite -eq 0 ]] && end "Directory already exists (use -o to overwrite): $extension_project_directory" 1
 
-    ext_path=$(realpath "$ext_path")
-    ext_directory="$ext_path/vscode-$ext_name"
-    [[ -d "$ext_directory" && $overwrite -eq 0 ]] && end "Directory already exists (use -o to overwrite): $ext_directory" 1
+    extension_className="$(echo "$extension_display_name" | sed -E 's/[^a-zA-Z0-9_]+//g')VSCodeExtension"
 
-    echo "Create VSCode extension project:"
-    echo "• Display Name: $ext_display_name"
-    echo "• Name: $ext_name"
-    echo "• Publisher: $ext_publisher"
-    echo "• ID: $ext_id"
-    echo "• Directory: $ext_directory"
+    echo "Create VS Code extension project:"
+    echo "• Publisher: $extension_publisher"
+    echo "• Display Name: $extension_display_name"
+    echo "• Name: $extension_name"
+    echo "• Class Name: $extension_className"
+    echo "• Directory: $extension_project_directory"
     [[ $overwrite -ne 1 ]] || echo "• Overwrite existing directory (if exists)"
-    [[ $install_dependencies -ne 1 ]] || echo "• Install NPM dependencies"
-    [[ $open_after_create -ne 1 ]] || echo "• Open project in VSCode after creating"
-    echo "• Template file: $template_file"
+    [[ $install_npm_dependencies -ne 1 ]] || echo "• Install NPM package dependencies"
+    [[ $open_after_create -ne 1 ]] || echo "• Open project in VS Code after creating"
+    echo "• Template file: $template_file_path"
 
 else # create
     if [[ $create_versioned_file -eq 1 ]]; then
@@ -172,24 +176,24 @@ else # create
         pkg_version=$(jq -r '.version' package.json)
         ([[ "$pkg_version" == "" || "$pkg_version" == "null" ]] && end "Failed to get version from $pkg_json_file" 1) || true
 
-        template_versioned_file="$(realpath $templates_directory)/vscx-template-v$pkg_version.zip"
+        template_versioned_file="$(realpath $templates_directory)/vscx-template-v${pkg_version}.zip"
         [[ -f "$template_versioned_file" && $overwrite -eq 0 ]] && end "File already exists (use -o to overwrite): $template_versioned_file" 1
     fi
 
     if [[ $custom_template_file -eq 1 ]]; then
-        if [[ -f "$template_file" ]]; then
+        if [[ -f "$template_file_path" ]]; then
             if [[ $overwrite -eq 1 ]]; then
                 echo "Removing existing file..."
-                rm -f "$template_file"
+                rm -f "$template_file_path"
             else
-                end "File already exists (use -o to overwrite): $template_file" 1
+                end "File already exists (use -o to overwrite): $template_file_path" 1
             fi
         fi
     fi
 
-    echo "Create VSCode extension template:"
+    echo "Create VS Code extension template:"
     [[ $create_versioned_file -ne 1 ]] || echo "• Version: $pkg_version"
-    echo "• Template file: $template_file"
+    echo "• Template file: $template_file_path"
     [[ $create_versioned_file -ne 1 ]] || echo "• Versioned file: $template_versioned_file"
     if [[ $overwrite -eq 1 ]]; then
         if [[ $custom_template_file -ne 1 ]]; then
@@ -203,46 +207,56 @@ fi
 confirm_run
 
 if [[ "$script_action" == "project" ]]; then
-    if [[ -d "$ext_directory" ]]; then
+    if [[ -d "$extension_project_directory" ]]; then
         if [[ $overwrite -eq 1 ]]; then
             echo "Removing existing directory..."
-            rm -rf "$ext_directory"
+            rm -rf "$extension_project_directory"
         else
-            end "Directory already exists (use -o to overwrite): $ext_directory" 1
+            end "Directory already exists (use -o to overwrite): $extension_project_directory" 1
         fi
     fi
 
     echo "Creating project directory..."
-    mkdir -p "$ext_directory"
+    mkdir -p "$extension_project_directory"
 
     echo "Unzipping template files to project directory..."
-    unzip -d "$ext_directory" "$template_file" || end "Failed to unzip file" 1
+    unzip -d "$extension_project_directory" "$template_file_path" || end "Failed to unzip file" 1
 
     echo "Updating project files..."
-    pushd "$ext_directory" >/dev/null
+    pushd "$extension_project_directory" >/dev/null
 
-    jq ".displayName = \"$ext_display_name\" | .name = \"$ext_name\" | .publisher = \"$ext_publisher\" | .contributes.configuration.title = \"$ext_display_name\"" package.json >package.json.tmp
+    jq ".displayName = \"$extension_display_name\" | .name = \"$extension_name\" | .publisher = \"$extension_publisher\" | .contributes.configuration.title = \"$extension_display_name\"" package.json >package.json.tmp
     mv package.json.tmp package.json
 
-    sed -i '' "s/change-me/$ext_id/g" package.json
-    sed -i '' "s/change-me/$ext_id/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts
-    sed -i '' "s/change-me/$ext_id/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts
+    for f in "package.json" src/VSCodeExtension/ExtensionTemplateVSCodeExtension*.ts; do
+        sed -i '' "s/{{displayName}}/$extension_display_name/g" "$f"
+        sed -i '' "s/{{name}}/$extension_name/g" "$f"
+        sed -i '' "s/{{publisher}}/$extension_publisher/g" "$f"
+    done
+
+    for f in "src/extension.ts" src/VSCodeExtension/ExtensionTemplateVSCodeExtension*.ts; do
+        sed -i '' "s/ExtensionTemplateVSCodeExtension/$extension_className/g" "$f"
+    done
+
+    for f in src/VSCodeExtension/ExtensionTemplateVSCodeExtension*.ts; do
+        mv "$f" "${f/ExtensionTemplateVSCodeExtension/$extension_className}"
+    done
 
     popd >/dev/null
 
-    echo "Finished creating project: $ext_directory"
+    echo "Finished creating project: $extension_project_directory"
 
-    if [[ $install_dependencies -eq 1 ]]; then
-        echo "Installing NPM dependencies..."
-        pushd "$ext_directory" >/dev/null
+    if [[ $install_npm_dependencies -eq 1 ]]; then
+        echo "Installing NPM package dependencies..."
+        pushd "$extension_project_directory" >/dev/null
         ./npmx.sh -y install
         popd >/dev/null
     fi
 
     if [[ $open_after_create -eq 1 ]]; then
-        echo "Opening project in VSCode..."
-        pushd "$ext_directory" >/dev/null
-        code "$ext_directory" &
+        echo "Opening project in VS Code..."
+        pushd "$extension_project_directory" >/dev/null
+        code "$extension_project_directory" &
         disown
         popd >/dev/null
     fi
@@ -257,50 +271,54 @@ elif [[ "$script_action" == "create" ]]; then
         fi
     fi
 
-    if [[ -f "$template_file" && $custom_template_file -ne 1 ]]; then
+    if [[ -f "$template_file_path" && $custom_template_file -ne 1 ]]; then
         echo "Removing existing latest file..."
-        rm -f "$template_file"
+        rm -f "$template_file_path"
     fi
 
     echo "Creating template file..."
-    zip -rX "$template_file" . \
-        -x ".DS_Store" \
+    zip -rX "$template_file_path" . \
         -x "*/.DS_Store" \
+        -x ".DS_Store" \
         -x ".git/*" \
         -x ".vscode-test/*" \
+        -x "build-webviews.sh" \
         -x "CHANGELOG.md" \
+        -x "README.md" \
         -x "dist/*" \
         -x "icon/*" \
         -x "images/*" \
         -x "node_modules/*" \
         -x "package-lock.json" \
         -x "package.json" \
-        -x "README.md" \
         -x "releases/*" \
-        -x "templates/*" \
-        -x "vscx-template.sh" \
-        -x "webviews/*" \
         -x "src/Utilities/*" \
         -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts" \
         -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts" \
-        -x "src/VSCodeExtension/VSCodeApi.ts" ||
+        -x "src/VSCodeExtension/VSCodeApi.ts" \
+        -x "templates/*" \
+        -x "vscx-template.sh" \
+        -x "webviews/*" ||
         end "Failed to create zip file" $?
 
-    template_file=$(realpath "$template_file")
+    template_file_path=$(realpath "$template_file_path")
 
     echo "Creating temporary template files..."
-    sed -n '/^# Requirements/,$p' README.md >"$templates_directory/files/README.md"
-    mkdir -p "$templates_directory/files/src/VSCodeExtension"
-    sed "s/extension-creator/change-me/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts >"$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"
-    sed "s/extension-creator/change-me/g" src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts >"$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts"
+    sed -n '/^# 📦 Requirements/,$p' README.md >"$templates_directory/files/README.md"
 
-    perl -0777 -i -pe 's/\n?[\t ]*\/\/ TEMPLATE-REMOVE-START.*?\/\/ TEMPLATE-REMOVE-END\n?//gs' "$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"
-    perl -0777 -i -pe 's/[\t ]*((\/\*\* TEMPLATE-ADD-START)|(TEMPLATE-ADD-END \*\/))\n//gs' "$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"
+    mkdir -p "$templates_directory/files/src/VSCodeExtension"
+    for f in src/VSCodeExtension/ExtensionTemplateVSCodeExtension*.ts; do
+        cp -f "$f" "$templates_directory/files/$f"
+        if [[ -f "$f" ]]; then
+            perl -0777 -i -pe 's/\n?[\t ]*\/\/ TEMPLATE-REMOVE-START.*?\/\/ TEMPLATE-REMOVE-END\n?//gs' "$templates_directory/files/$f"
+            perl -0777 -i -pe 's/[\t ]*((\/\*\* TEMPLATE-ADD-START)|(TEMPLATE-ADD-END \*\/))\n//gs' "$templates_directory/files/$f"
+        fi
+    done
 
     pushd "${templates_directory}/files" >/dev/null
 
     echo "Adding temporary template files to latest template file..."
-    zip -rX "$template_file" * \
+    zip -rX "$template_file_path" * \
         -x ".DS_Store" \
         -x "*/.DS_Store" || end "Failed to add files to zip" $?
 
@@ -308,14 +326,13 @@ elif [[ "$script_action" == "create" ]]; then
 
     echo "Removing temporary template files..."
     rm -f "$templates_directory/files/README.md"
-    rm -f "$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts"
-    rm -f "$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts"
+    rm -f "$templates_directory/files/src/VSCodeExtension/ExtensionTemplateVSCodeExtension*.ts"
 
     if [[ $create_versioned_file -eq 1 ]]; then
         echo "Creating versioned template file..."
-        cp "$template_file" "$template_versioned_file"
+        cp "$template_file_path" "$template_versioned_file"
     fi
 
-    echo "Template file created: $template_file"
+    echo "Template file created: $template_file_path"
     [[ $create_versioned_file -ne 1 ]] || echo "Versioned file created: $template_versioned_file"
 fi

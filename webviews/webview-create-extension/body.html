@@ -1,0 +1,55 @@
+<header>
+    <h1>Create Visual Studio Code Extension Project</h1>
+    <h3><a href="https://github.com/kokoabim/vscode-extension-template/blob/main/README.md" target="_blank" rel="noopener">Learn more</a> about creating, testing and publishing Visual Studio Code extensions.</h3>
+</header>
+
+<vscode-divider></vscode-divider>
+
+<h2>Enter the settings for the new extension</h2>
+<h3>These settings can later be modified in the <code>package.json</code> file. Learn more about the extension manifest <a href="https://code.visualstudio.com/api/references/extension-manifest" target="_blank" rel="noopener">here</a> and <a href="https://docs.npmjs.com/cli/v11/configuring-npm/package-json" target="_blank" rel="noopener">here</a>. You may set default values for some of these settings in the VS Code Extension Creator <span id="open-extension-creator-settings-action" class="actionable">extension settings</span>.</h3>
+
+<form id="webview-form">
+    <vscode-form-group variant="vertical">
+        <vscode-label for="extension_publisher">Publisher ID</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_publisher" name="extension_publisher" form="webview-form" placeholder="spencerjames"></vscode-textfield></div>
+        <p class="textfield-note">Your Visual Studio Marketplace Publisher ID. <a href="https://marketplace.visualstudio.com/manage/publishers" target="_blank" rel="noopener">Manage</a> your publishers and extensions.</p>
+
+        <vscode-label for="extension_displayName">Extension Display Name</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_displayName" name="extension_displayName" form="webview-form" placeholder="Thingamajig"></vscode-textfield></div>
+        <p class="textfield-note">Display name of the extension. Must be unique in the Visual Studio Marketplace. Shown in the Visual Studio Marketplace.</p>
+
+        <vscode-label for="extension_name">Extension Name</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_name" name="extension_name" form="webview-form" placeholder="thingamajig" pattern="^[a-z0-9\-._]+$"></vscode-textfield></div>
+        <p class="textfield-note">Name of the extension. Must be unique in the Visual Studio Marketplace. Not displayed on the UI.</p>
+
+        <vscode-label for="extension_version">Extension Version</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_version" name="extension_version" form="webview-form" placeholder="1.0.0" pattern="^\d+\.\d+\.\d+?$"></vscode-textfield></div>
+        <p class="textfield-note">Version of the extension. Must follow <a href="https://semver.org/" target="_blank" rel="noopener">semantic</a> versioning.</p>
+
+        <vscode-label for="extension_description">Extension Description</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_description" name="extension_description" form="webview-form" placeholder="All your base are belong to us"></vscode-textfield></div>
+        <p class="textfield-note">Short description of what the extension is and does. Shown in the Visual Studio Marketplace.</p>
+
+        <vscode-label for="extension_className">Extension TypeScript Class Name</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_className" name="extension_className" form="webview-form" placeholder="ThingamajigVSCodeExtension" pattern="^[a-zA-Z0-9\-._]+$"></vscode-textfield></div>
+        <p class="textfield-note">Name of the extension TypeScript class name.</p>
+
+        <vscode-label for="parent_directory">Project Location</vscode-label>
+        <div class="textfield-with-icon">
+            <vscode-textfield id="parent_directory" name="parent_directory" form="webview-form" placeholder="~/Projects"></vscode-textfield>
+            <span id="select-project-location-action" title="Select project location" class="clickable"><i class="codicon codicon-folder-opened"></i>Browse...</span>
+        </div>
+        <p class="textfield-note">Parent directory where the new project directory is created.</p>
+
+        <vscode-label for="parent_directory">Options</vscode-label>
+        <vscode-checkbox-group variant="vertical">
+            <vscode-checkbox name="overwrite_destination_path" form="webview-form">Overwrite destination path (if file or directory exists)</vscode-checkbox>
+            <vscode-checkbox name="install_npm_dependencies" form="webview-form" checked="checked">Install NPM package dependencies</vscode-checkbox>
+            <vscode-checkbox name="open_in_vscode" form="webview-form" checked="checked">Open project after creation</vscode-checkbox>
+        </vscode-checkbox-group>
+    </vscode-form-group>
+
+    <div class="button-group">
+        <vscode-button id="cancel-action">Cancel</vscode-button><vscode-button id="submit-action" type="submit" form="webview-form" disabled="disabled">Create Project</vscode-button>
+    </div>
+</form>

@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ES2022",
+        "lib": [
+            "ES2022",
+            "DOM"
+        ],
+        "rootDir": "./",
+        "outDir": "./",
+        "allowJs": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "inlineSourceMap": true
+    },
+    "include": [
+        "./*.ts"
+    ],
+    "exclude": [
+        "./main.*",
+        "./webpack.config.*"
+    ]
+}

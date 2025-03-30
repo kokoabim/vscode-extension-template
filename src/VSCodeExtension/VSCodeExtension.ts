@@ -48,15 +48,15 @@ export abstract class VSCodeExtension implements VSCodeExtensionUI {
         await vscode.window.showInformationMessage(`${noPrefix ? "" : `${this.shortName}: `}${message}`);
     }
 
-    public async modalError(title: string, detail: string, ...items: string[]): Promise<string | undefined> {
+    public async modalError(title: string, detail?: string, ...items: string[]): Promise<string | undefined> {
         return await vscode.window.showErrorMessage(title, { detail: detail, modal: true }, ...items);
     }
 
-    public async modalInformation(title: string, detail: string, ...items: string[]): Promise<string | undefined> {
+    public async modalInformation(title: string, detail?: string, ...items: string[]): Promise<string | undefined> {
         return await vscode.window.showInformationMessage(title, { detail: detail, modal: true }, ...items);
     }
 
-    public async modalWarning(title: string, detail: string, ...items: string[]): Promise<string | undefined> {
+    public async modalWarning(title: string, detail?: string, ...items: string[]): Promise<string | undefined> {
         return await vscode.window.showWarningMessage(title, { detail: detail, modal: true }, ...items);
     }
 

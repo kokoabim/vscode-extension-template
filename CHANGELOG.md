@@ -1,3 +1,12 @@
+## β Beta
+
+#### 2025-03-29 — 0.1.0
+
+-   Added webview panel for creating new VS Code extension projects (replaces the previous input boxes).
+-   Added a new command (Package Visual Studio Code Extension...) to open a webview panel for building extension packages (.vsix) for distribution. Use of `./vscx.sh` is no longer required.
+-   Many various changes to support the new webview panels and commands.
+-   Other minor fixes and improvements.
+
 ## ⍺ Alpha
 
 #### 2025-03-22 — 0.0.6

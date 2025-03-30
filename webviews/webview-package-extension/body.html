@@ -1,0 +1,66 @@
+<header>
+    <h1>Package Visual Studio Code Extension</h1>
+    <h3><a href="https://github.com/kokoabim/vscode-extension-template/blob/main/README.md" target="_blank" rel="noopener">Learn more</a> about creating, testing and publishing Visual Studio Code extensions.</h3>
+</header>
+
+<vscode-divider></vscode-divider>
+
+<h2>Verify the settings of the extension</h2>
+<h3>Edit <span class="actionable open-package-json-action" title="Open package.json">package.json</span> to make changes. Learn more about the extension manifest <a href="https://code.visualstudio.com/api/references/extension-manifest" target="_blank" rel="noopener">here</a> and <a href="https://docs.npmjs.com/cli/v11/configuring-npm/package-json" target="_blank" rel="noopener">here</a>. You may set default values for some of these settings in the VS Code Extension Creator <span id="open-extension-creator-settings-action" class="actionable">extension settings</span>.</h3>
+
+<form id="webview-form">
+    <vscode-form-group variant="vertical">
+        <vscode-label for="extension_publisher">Publisher ID</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_publisher" name="extension_publisher" form="webview-form" readonly="readonly"></vscode-textfield></div>
+        <p class="textfield-note">Your Visual Studio Marketplace Publisher ID. <a href="https://marketplace.visualstudio.com/manage/publishers" target="_blank" rel="noopener">Manage</a> your publishers and extensions.</p>
+
+        <vscode-label for="extension_displayName">Extension Display Name</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_displayName" name="extension_displayName" form="webview-form" readonly="readonly"></vscode-textfield></div>
+        <p class="textfield-note">Display name of the extension. Must be unique in the Visual Studio Marketplace. Shown in the Visual Studio Marketplace.</p>
+
+        <vscode-label for="extension_name">Extension Name</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_name" name="extension_name" form="webview-form" readonly="readonly"></vscode-textfield></div>
+        <p class="textfield-note">Name of the extension. Must be unique in the Visual Studio Marketplace. Not displayed on the UI.</p>
+
+        <vscode-label for="extension_version">Extension Version</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_version" name="extension_version" form="webview-form" readonly="readonly"></vscode-textfield></div>
+        <p class="textfield-note">Version of the extension. Must follow <a href="https://semver.org/" target="_blank" rel="noopener">semantic</a> versioning.</p>
+
+        <vscode-label for="extension_description">Extension Description</vscode-label>
+        <div class="textfield"><vscode-textfield id="extension_description" name="extension_description" form="webview-form" readonly="readonly"></vscode-textfield></div>
+        <p class="textfield-note">Short description of what the extension is and does. Shown in the Visual Studio Marketplace.</p>
+
+        <vscode-label for="output_directory">Output Location</vscode-label>
+        <div class="textfield-with-icon">
+            <vscode-textfield id="output_directory" name="output_directory" form="webview-form"></vscode-textfield>
+            <span id="select-output-location-action" title="Select output location" class="clickable"><i class="codicon codicon-folder-opened"></i>Browse...</span>
+        </div>
+        <p class="textfield-note">Directory where the package is saved.</p>
+
+        <vscode-label for="package_file_name">Package File Name</vscode-label>
+        <div class="textfield"><vscode-textfield id="package_file_name" name="package_file_name" form="webview-form"></vscode-textfield></div>
+        <p class="textfield-note">This can be modified. Automatic format is: <code>{publisher}_{name}_{version}.vsix</code></p>
+
+        <vscode-label>Suggested settings <span class="normal-text">(edit <span class="actionable open-package-json-action" title="Open package.json">package.json</span> to address warnings and errors)</span></vscode-label>
+        <ul>
+            <li id="suggestion_icon" class="suggestion">Icon path<span id="suggestion-message_icon" class="suggestion-message"></span></li>
+            <li id="suggestion_categories" class="suggestion">Categories<span id="suggestion-message_categories" class="suggestion-message"></span></li>
+            <li id="suggestion_keywords" class="suggestion">Keywords<span id="suggestion-message_keywords" class="suggestion-message"></span></li>
+            <li id="suggestion_homepage" class="suggestion">Homepage link<span id="suggestion-message_homepage" class="suggestion-message"></span></li>
+            <li id="suggestion_issues" class="suggestion">Issues link<span id="suggestion-message_issues" class="suggestion-message"></span></li>
+            <li id="suggestion_repository" class="suggestion">Repository link<span id="suggestion-message_repository" class="suggestion-message"></span></li>
+            <li id="suggestion_license" class="suggestion">License<span id="suggestion-message_license" class="suggestion-message"></span></li>
+        </ul>
+
+        <vscode-label for="parent_directory">Options</vscode-label>
+        <vscode-checkbox-group variant="vertical">
+            <vscode-checkbox name="pre_release_version" form="webview-form">Pre-release version (<a href="https://code.visualstudio.com/api/working-with-extensions/publishing-extension#prerelease-extensions" target="_blank" rel="noopener">learn more</a> about pre-release versions)</vscode-checkbox>
+            <vscode-checkbox name="overwrite_destination_path" form="webview-form">Overwrite destination path (if file or directory exists)</vscode-checkbox>
+            <vscode-checkbox name="install_extension" form="webview-form">Install extension for local testing (uninstall after testing)</vscode-checkbox>
+        </vscode-checkbox-group>
+    </vscode-form-group>
+
+    <div class="button-group">
+        <vscode-button id="cancel-action">Cancel</vscode-button><vscode-button id="submit-action" type="submit" form="webview-form" disabled="disabled">Build Package</vscode-button>
+    </div>
+</form>

@@ -9,6 +9,7 @@ export interface ExtensionProjectGenerateSettings {
     displayName?: string;
     installNpmDependencies?: boolean;
     name?: string;
+    openInNewWindow?: boolean;
     openInVSCode?: boolean;
     overwriteProjectDestinationPath?: boolean;
     parentDirectory?: string;
@@ -28,13 +29,15 @@ export class VSCodeExtensionProjectGenerator {
 
     /** Generates a new VSCode extension project using the included latest template file. */
     public async generateExtensionProject(generateSettings: ExtensionProjectGenerateSettings): Promise<TriBoolean> {
+        this.output.channelOutputLine("🚀 Generating new Visual Studio Code extension project...", true);
+
         if (!await this.fileSystem.fileExists(this.latestTemplatePath)) {
-            await this.output.modalError("Template not found", `Unable to find template: ${this.latestTemplatePath}`);
+            this.output.channelOutputLine(`❌ Unable to find template: ${this.latestTemplatePath}`);
             return false;
         }
 
         if (!generateSettings.displayName || !generateSettings.parentDirectory || !generateSettings.publisher) {
-            await this.output.modalError("Missing settings", "Missing 'displayName', 'parentDirectory' or 'publisher' in extension project generate settings.");
+            this.output.channelOutputLine("❌ Missing 'displayName', 'parentDirectory' or 'publisher' in extension project generate settings.");
             return false;
         }
 
@@ -44,29 +47,30 @@ export class VSCodeExtensionProjectGenerator {
         const fsEntryTypeAtProjectPath = await this.fileSystem.getEntryType(generateSettings.projectDirectory);
         if (fsEntryTypeAtProjectPath === FsEntryType.directory || fsEntryTypeAtProjectPath === FsEntryType.file || fsEntryTypeAtProjectPath === FsEntryType.symbolicLink) {
             if (generateSettings.overwriteProjectDestinationPath !== true && "Yes" !== await this.output.modalWarning(`${fsEntryTypeAtProjectPath} exists`, `Would you like to overwrite '${generateSettings.projectDirectory}'?`, "Yes", "No")) {
+                this.output.channelOutputLine("👎🏼 Aborted.");
                 return false;
             }
 
             const deleted = await this.fileSystem.removeEntry(generateSettings.projectDirectory);
             if (!deleted) {
-                this.output.error(`Failed to delete: ${generateSettings.projectDirectory}`);
+                this.output.channelOutputLine(`❌ Failed to delete: ${generateSettings.projectDirectory}`);
                 return false;
             }
         }
         else if (fsEntryTypeAtProjectPath !== FsEntryType.none) {
-            await this.output.modalWarning(`${fsEntryTypeAtProjectPath} exists`, `Unable to continue due to file system entry type that exists at project directory: ${generateSettings.projectDirectory}`);
+            this.output.channelOutputLine(`❌ Unable to continue due to file system entry type ${fsEntryTypeAtProjectPath} that exists at project directory: ${generateSettings.projectDirectory}`);
             return false;
         }
 
         const createdDirectory = await this.fileSystem.createDirectory(generateSettings.projectDirectory);
         if (!createdDirectory) {
-            this.output.error(`Failed to create directory: ${generateSettings.projectDirectory}`);
+            this.output.channelOutputLine(`❌ Failed to create directory: ${generateSettings.projectDirectory}`);
             return false;
         }
 
         const unzipped = await this.fileSystem.unzip(this.latestTemplatePath, generateSettings.projectDirectory);
         if (!unzipped) {
-            this.output.modalError("Failed", "Failed to unzip template to directory.");
+            this.output.channelOutputLine("❌ Failed to unzip template to directory.");
             return false;
         }
 
@@ -79,7 +83,7 @@ export class VSCodeExtensionProjectGenerator {
         const extensionManifest = await this.fileSystem.readJsonFile<any>(extensionManifestPath);
         if (!extensionManifest) {
             result = "partial";
-            this.output.modalError("Failed to read extension manifest", packageJsonManuallyEditMessage);
+            this.output.channelOutputLine(`⚠️ Failed to read extension manifest. ${packageJsonManuallyEditMessage}`);
             // NOTE: continue on error
         }
         else {
@@ -94,7 +98,7 @@ export class VSCodeExtensionProjectGenerator {
             const packageJsonSaved = await this.fileSystem.writeFile(extensionManifestPath, extensionManifest, true);
             if (!packageJsonSaved) {
                 result = "partial";
-                this.output.modalError("Failed to write extension manifest", packageJsonManuallyEditMessage);
+                this.output.channelOutputLine(`⚠️ Failed to write extension manifest. ${packageJsonManuallyEditMessage}`);
                 // NOTE: continue on error
             }
         }
@@ -113,7 +117,7 @@ export class VSCodeExtensionProjectGenerator {
 
             if (!didReplaceInFile) {
                 result = "partial";
-                this.output.modalWarning("Failed to replace", `Failed to replace placeholders in: ${fileToReplaceIn}`);
+                this.output.channelOutputLine(`⚠️ Failed to replace placeholders in '${fileToReplaceIn}'. You will need to edit the file manually.`);
                 // NOTE: continue on error
             }
         }
@@ -134,7 +138,7 @@ export class VSCodeExtensionProjectGenerator {
 
                 if (!didReplaceInFile) {
                     result = "partial";
-                    this.output.modalWarning("Failed to set class name", `Failed to set class name in: ${fileToReplaceIn}`);
+                    this.output.channelOutputLine(`⚠️ Failed to set class name in '${fileToReplaceIn}'. You will need to edit the file manually.`);
                     // NOTE: continue on error
                 }
             }
@@ -150,19 +154,29 @@ export class VSCodeExtensionProjectGenerator {
 
                 if (!didRenameFile) {
                     result = "partial";
-                    this.output.modalWarning("Failed to rename", `Failed to rename file: ${fileToMove} -> ${newFilePath}`);
+                    this.output.channelOutputLine(`⚠️ Failed to rename file '${fileToMove}' to '${newFilePath}'. You will need to rename the file manually.`);
                     // NOTE: continue on error
                 }
             }
         }
+
+        this.output.channelOutputLine((result === true // will be either True or "partial" at this point
+            ? `✅ Extension project generated`
+            : `⚠️ Extension project generated with issues you must address manually`)
+            + `: ${generateSettings.projectDirectory}`);
 
         return result;
     }
 
     /** Installs NPM package dependencies at the specified directory. */
     public async installNpmDependenciesUsingNpmx(directory: string, output: VSCodeExtensionUI): Promise<boolean> {
-        output.showChannel();
+        output.channelOutputLine("📦 Installing NPM package dependencies...", true);
         const execResult = await this.executor.exec("npm install", directory, ExecutorExecOutput.outputChannel, output);
+
+        output.channelOutputLine(execResult.success
+            ? "✅ NPM package dependencies installed."
+            : "❌ Error installing NPM package dependencies. You will need to run './npmx.sh install' manually.");
+
         return execResult.success;
     }
 }

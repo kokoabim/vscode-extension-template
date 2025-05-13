@@ -1,7 +1,7 @@
 {
     "name": "extension-creator",
     "publisher": "spencerjames",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Create and publish your own Visual Studio Code extensions",
     "displayName": "VS Code Extension Creator",
     "shortName": "Extension Creator",
@@ -113,21 +113,21 @@
     },
     "devDependencies": {
         "@types/node": "^22.x",
-        "@typescript-eslint/eslint-plugin": "^8.28.0",
-        "@typescript-eslint/parser": "^8.28.0",
+        "@typescript-eslint/eslint-plugin": "^8.32.1",
+        "@typescript-eslint/parser": "^8.32.1",
         "@vscode/test-cli": "^0.0.10",
-        "@vscode/test-electron": "^2.4.1",
-        "eslint": "^9.23.0",
+        "@vscode/test-electron": "^2.5.2",
+        "eslint": "^9.26.0",
         "ts-loader": "^9.5.2",
         "ts-node": "^10.9.2",
-        "typescript": "^5.8.2",
-        "webpack": "^5.97.1",
+        "typescript": "^5.8.3",
+        "webpack": "^5.99.8",
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
-        "@vscode/codicons": "^0.0.36",
         "@types/vscode": "^1.96.0",
-        "@vscode-elements/elements": "^1.14.0",
+        "@vscode-elements/elements": "^1.15.0",
+        "@vscode/codicons": "^0.0.36",
         "extract-zip": "^2.0.1"
     }
 }

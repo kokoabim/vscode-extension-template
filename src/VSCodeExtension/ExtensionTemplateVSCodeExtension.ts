@@ -69,29 +69,24 @@ export class ExtensionTemplateVSCodeExtension extends VSCodeExtension {
         const didCreateProject = await this.extensionProjectGenerator.generateExtensionProject(extensionProjectSettings);
         if (didCreateProject === false) return;
 
-        if (extensionProjectSettings.installNpmDependencies === false && extensionProjectSettings.openInVSCode === false) {
-            if (didCreateProject === true) await this.information("Extension project created");
-            else await this.warning("Extension project created but with issues");
-            return;
-        }
+        if (extensionProjectSettings.installNpmDependencies === false && extensionProjectSettings.openInVSCode === false) return;
 
         if (extensionProjectSettings.installNpmDependencies) {
-            if (!await this.extensionProjectGenerator.installNpmDependenciesUsingNpmx(extensionProjectSettings.projectDirectory!, this)) {
-                await this.modalError("Failed NPM package dependencies", "You will need to run './npmx.sh install' manually.");
-            }
+            await this.extensionProjectGenerator.installNpmDependenciesUsingNpmx(extensionProjectSettings.projectDirectory!, this);
         }
 
         if (extensionProjectSettings.openInVSCode) {
             const openFolderSettings: VSCodeApi.IOpenFolderAPICommandOptions = {};
 
-            if (await this.isWorkspaceOpen(false)) openFolderSettings.forceNewWindow = true;
+            if (extensionProjectSettings.openInNewWindow || await this.isWorkspaceOpen(false)) openFolderSettings.forceNewWindow = true;
             else openFolderSettings.forceReuseWindow = true;
 
             await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(extensionProjectSettings.projectDirectory!), openFolderSettings);
         }
 
-        if (didCreateProject === true) await this.information("Extension project created");
-        else await this.warning("Extension project created but with issues");
+        this.channelOutputLine(didCreateProject
+            ? "🎉 Extension project is ready!"
+            : "🤷🏼‍♂️ Extension project is ready but with issues you need to address manually. If this problem persists, please submit an issue on GitHub.");
     }
 
     private async openCreateExtensionWebview(): Promise<void> {
@@ -163,6 +158,7 @@ extension: ${JSON.stringify(settings)}
                     displayName: message.settings.extension_displayName,
                     installNpmDependencies: message.settings.install_npm_dependencies ? true : false,
                     name: message.settings.extension_name,
+                    openInNewWindow: message.settings.open_in_new_window ? true : false,
                     openInVSCode: message.settings.open_in_vscode ? true : false,
                     overwriteProjectDestinationPath: message.settings.overwrite_destination_path ? true : false,
                     parentDirectory: message.settings.parent_directory,

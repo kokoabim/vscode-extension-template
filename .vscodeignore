@@ -20,4 +20,5 @@ tsconfig.publish.json
 dist/test/
 releases/
 src/
+templates/files/
 templates/vscx-template-v*.zip

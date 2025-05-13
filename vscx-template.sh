@@ -29,7 +29,7 @@
 set -eo pipefail
 
 script_name="${0##*/}"
-script_ver="1.0.2"
+script_ver="1.0.3"
 script_title="Visual Studio Code Extension Template"
 script_options="f:x:"
 script_switches="chioy"
@@ -293,6 +293,7 @@ elif [[ "$script_action" == "create" ]]; then
         -x "package.json" \
         -x "releases/*" \
         -x "src/Utilities/*" \
+        -x "src/Types/*" \
         -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtension.ts" \
         -x "src/VSCodeExtension/ExtensionTemplateVSCodeExtensionSettings.ts" \
         -x "src/VSCodeExtension/VSCodeApi.ts" \

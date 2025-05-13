@@ -1,5 +1,10 @@
 ## β Beta
 
+#### 2025-05-12 — 0.2.0
+
+-   Added 'Open in new window' checkbox option on 'Create Visual Studio Code Extension Project' form.
+-   Added additional logging to channel output when creating a new VS Code extension project.
+
 #### 2025-03-29 — 0.1.0
 
 -   Added webview panel for creating new VS Code extension projects (replaces the previous input boxes).

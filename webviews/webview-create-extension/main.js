@@ -83,6 +83,7 @@ function updateUI(model) {
     setCheckboxValue(model.extension, "overwriteProjectDestinationPath", "overwrite_destination_path");
     setCheckboxValue(model.extension, "installNPMDependencies", "install_npm_dependencies");
     setCheckboxValue(model.extension, "openInVSCode", "open_in_vscode");
+    setCheckboxValue(model.extension, "openInNewWindow", "open_in_new_window");
 
     updateExtensionName();
     updateSubmitButtonState();
